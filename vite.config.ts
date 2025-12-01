@@ -2,15 +2,12 @@ import { defineConfig } from 'vite'
 import { devtools } from '@tanstack/devtools-vite'
 import viteReact from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
+// DO NOT import TanStackRouterDevtools or any router plugin here!
 
-import { fileURLToPath, URL } from 'node:url'
-
-// https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [devtools(), viteReact(), tailwindcss()],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-    },
-  },
+  plugins: [
+    devtools(), // for Query
+    viteReact(),
+    tailwindcss()
+  ]
 })

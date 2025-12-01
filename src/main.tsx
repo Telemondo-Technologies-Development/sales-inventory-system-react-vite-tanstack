@@ -1,62 +1,75 @@
-import { StrictMode } from 'react'
+import React from 'react'
 import ReactDOM from 'react-dom/client'
 import {
-  Outlet,
-  RouterProvider,
   createRootRoute,
   createRoute,
   createRouter,
+  RouterProvider,
 } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
+import RootLayout from './routes/__root'
+import RootLogin from './routes/authlayout'
+import LoginPage from './routes/login'
+import Profile from './routes/profile'
+import Index from './routes/index'
+import TabletOrderInterface from './routes/table-orders'
 import './styles.css'
-import reportWebVitals from './reportWebVitals.ts'
 
-import App from './App.tsx'
+// ---- Single root route ----
+const rootRoute = createRootRoute()
 
-const rootRoute = createRootRoute({
-  component: () => (
-    <>
-      <Outlet />
-      <TanStackRouterDevtools />
-    </>
-  ),
+// ---- Layout routes ----
+const appLayout = createRoute({
+  getParentRoute: () => rootRoute,
+  id: 'app',
+  component: RootLayout,
+})
+
+const loginLayout = createRoute({
+  getParentRoute: () => rootRoute,
+  id: 'auth',
+  component: RootLogin,
+})
+
+// ---- Page routes ----
+const loginRoute = createRoute({
+  getParentRoute: () => loginLayout,
+  path: '/',
+  component: LoginPage,
+})
+
+const profileRoute = createRoute({
+  getParentRoute: () => appLayout,
+  path: '/profile',
+  component: Profile,
 })
 
 const indexRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/',
-  component: App,
+  getParentRoute: () => appLayout,
+  path: '/index',
+  component: Index,
 })
 
-const routeTree = rootRoute.addChildren([indexRoute])
-
-const router = createRouter({
-  routeTree,
-  context: {},
-  defaultPreload: 'intent',
-  scrollRestoration: true,
-  defaultStructuralSharing: true,
-  defaultPreloadStaleTime: 0,
+const tabletOrderRoute = createRoute({
+  getParentRoute: () => appLayout,
+  path: '/table-orders',
+  component: TabletOrderInterface,
 })
 
-declare module '@tanstack/react-router' {
-  interface Register {
-    router: typeof router
-  }
-}
+// ---- Build route tree ----
+const routeTree = rootRoute.addChildren([
+  loginLayout.addChildren([loginRoute]),
+  appLayout.addChildren([profileRoute, indexRoute, tabletOrderRoute]),
+])
 
-const rootElement = document.getElementById('app')
-if (rootElement && !rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement)
-  root.render(
-    <StrictMode>
-      <RouterProvider router={router} />
-    </StrictMode>,
-  )
-}
+const router = createRouter({ routeTree })
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals()
+// ---- Mount React ----
+const rootElement = document.getElementById('root')
+if (!rootElement) throw new Error('Root element not found')
+
+ReactDOM.createRoot(rootElement).render(
+  <React.StrictMode>
+    <RouterProvider router={router} />
+  </React.StrictMode>
+)

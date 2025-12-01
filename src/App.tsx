@@ -1,36 +1,80 @@
-import logo from './logo.svg'
+import {
+  createRootRoute,
+  createRoute,
+  createRouter,
+  RouterProvider,
+} from '@tanstack/react-router'
 
-function App() {
+import Index from './routes/index'
+import Profile from './routes/profile'
+import LoginPage from './routes/login'
+import TabletOrderInterface from './routes/tabletOrderInterface'
+
+import RootLayout from './routes/__root'
+import RootLogin from './routes/authlayout'
+
+import './styles.css'
+
+// ------------------------
+// Root Layout
+// ------------------------
+const rootRoute = createRootRoute({
+  component: RootLayout,
+})
+
+// ------------------------
+// Login Layout (nested)
+// ------------------------
+const loginLayoutRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  id: 'loginLayout',
+  component: RootLogin,
+})
+
+// ------------------------
+// Child Routes
+// ------------------------
+const loginRoute = createRoute({
+  getParentRoute: () => loginLayoutRoute,
+  path: '/',
+  component: LoginPage,
+})
+
+const indexRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/index',
+  component: Index,
+})
+
+const profileRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/profile',
+  component: Profile,
+})
+
+// ------------------------
+// Route Tree
+// ------------------------
+const routeTree = rootRoute.addChildren([
+  loginLayoutRoute.addChildren([loginRoute]),
+  indexRoute,
+  profileRoute,
+])
+
+// ------------------------
+// Router
+// ------------------------
+const router = createRouter({
+  routeTree,
+})
+
+import { TanStackRouterDevtoolsInProd } from '@tanstack/react-router-devtools'
+
+export default function App() {
   return (
-    <div className="text-center">
-      <header className="min-h-screen flex flex-col items-center justify-center bg-[#282c34] text-white text-[calc(10px+2vmin)]">
-        <img
-          src={logo}
-          className="h-[40vmin] pointer-events-none animate-[spin_20s_linear_infinite]"
-          alt="logo"
-        />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="text-[#61dafb] hover:underline"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <a
-          className="text-[#61dafb] hover:underline"
-          href="https://tanstack.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn TanStack
-        </a>
-      </header>
-    </div>
+    <>
+      <RouterProvider router={router} />
+      <TanStackRouterDevtoolsInProd />
+    </>
   )
 }
-
-export default App
