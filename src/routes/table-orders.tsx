@@ -1,6 +1,7 @@
 import { useState } from "react"
-import { Plus, Minus, LogOut, Send } from "lucide-react"
+import { Plus, Minus, Send } from "lucide-react"
 import { useNavigate } from "@tanstack/react-router"
+import { addOrder } from "@/lib/dexie"
 
 interface MenuItem {
   id: string
@@ -38,94 +39,99 @@ export default function TabletOrderInterface() {
   const addToCart = (item: MenuItem) => {
     const existing = cartItems.find((ci) => ci.id === item.id)
     if (existing) {
-      setCartItems(cartItems.map((ci) => (ci.id === item.id ? { ...ci, quantity: ci.quantity + 1 } : ci)))
+      setCartItems((prev) => prev.map((ci) => (ci.id === item.id ? { ...ci, quantity: ci.quantity + 1 } : ci)))
     } else {
-      setCartItems([...cartItems, { id: item.id, name: item.name, price: item.price, quantity: 1 }])
+      setCartItems((prev) => [...prev, { id: item.id, name: item.name, price: item.price, quantity: 1 }])
     }
   }
 
-  const removeFromCart = (id: string) => setCartItems(cartItems.filter((ci) => ci.id !== id))
+  const removeFromCart = (id: string) => setCartItems((prev) => prev.filter((ci) => ci.id !== id))
 
   const updateQuantity = (id: string, quantity: number) => {
     if (quantity <= 0) removeFromCart(id)
-    else setCartItems(cartItems.map((ci) => (ci.id === id ? { ...ci, quantity } : ci)))
+    else setCartItems((prev) => prev.map((ci) => (ci.id === id ? { ...ci, quantity } : ci)))
   }
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const tax = subtotal * 0.15
   const total = subtotal + tax
 
-  const handleSubmitOrder = () => {
+  const handleSubmitOrder = async () => {
     if (!tableName || cartItems.length === 0) {
       alert("Please select a table and add items to order")
       return
     }
 
+    // Build order object
     const order = {
       id: `ORD-${Date.now()}`,
       tableNumber: tableName,
       items: cartItems,
       notes,
-      status: "pending",
+      status: "pending" as const,
       createdAt: new Date().toISOString(),
       subtotal,
       tax,
       total,
     }
 
-    const orders = JSON.parse(localStorage.getItem("orders") || "[]")
-    orders.push(order)
-    localStorage.setItem("orders", JSON.stringify(orders))
+    // Optimistic UI: notify other parts of the app immediately
+    // detail: { action, order, optimistic }
+    window.dispatchEvent(new CustomEvent("orders-updated", { detail: { action: "add", order, optimistic: true } }))
 
-    alert("Order submitted successfully!")
+    try {
+      // Persist to Dexie (async)
+      await addOrder(order)
+      // confirm: let listeners know the write succeeded (they may reload / reconcile)
+      window.dispatchEvent(new CustomEvent("orders-updated", { detail: { action: "confirm", orderId: order.id } }))
+    } catch (err) {
+      // rollback: tell listeners to remove the optimistic order
+      window.dispatchEvent(new CustomEvent("orders-updated", { detail: { action: "rollback", orderId: order.id } }))
+      console.error("Failed to save order to DB:", err)
+      alert("Failed to submit order. Please try again.")
+      return
+    }
+
+    // If saved successfully, clear local cart and inputs
     setCartItems([])
     setTableName("")
     setNotes("")
-  }
-
-  const handleLogout = () => {
-    localStorage.removeItem("currentUser")
-    navigate("/") // navigate using TanStack Router
+    alert("Order submitted successfully!")
   }
 
   return (
-    <div className="min-h-screen bg-[#ffffff] p-4">
+    <div className="min-h-screen p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-foreground">New Order</h1>
-          <button
-            onClick={handleLogout}
-            className="flex items-center gap-2 px-4 py-2 bg-destructive/10 text-destructive rounded-lg hover:bg-destructive/20 transition-all"
-          >
-            <LogOut className="w-5 h-5" />
-            Logout
-          </button>
+        <div className="flex justify-between items-center mb-[16px] bg-[#ffffff] rounded-xl p-4 shadow-sm elevation-1 ">
+          <h1 className="text-3xl font-semibold text-[#266489] ">Menu</h1>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Menu Section */}
-          <div className="lg:col-span-2">
-            <div className="elevation-1 bg-[##faf8ff] rounded-2xl p-6">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_360px]">
+          {/* Menu Section - flexible column (takes remaining width) */}
+          <div>
+            <div className="elevation-1 bg-[#ffffff] rounded-2xl p-6 ">
               {categories.map((category) => {
                 const categoryItems = menuItems.filter((m) => m.category === category)
                 return (
                   <div key={category} className="mb-8">
-                    <h2 className="text-lg font-semibold text-card-foreground mb-4 text-primary">{category}</h2>
+                    <h2 className="text-lg font-semibold  mb-4 text-[#266489]">{category}</h2>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                       {categoryItems.map((item) => (
                         <button
                           key={item.id}
                           onClick={() => addToCart(item)}
-                          className="elevation-1 bg-card border border-border rounded-xl p-4 hover:elevation-2 hover:border-primary transition-all group"
+                          className="elevation-1 bg-card border border-[#c1c7ce] rounded-xl p-4 hover:elevation-2 hover:border-[#50606e] transition-all group text-left"
                         >
                           <img
                             src={item.image || "/placeholder.svg"}
                             alt={item.name}
                             className="w-full h-24 object-cover rounded-lg mb-3"
                           />
-                          <p className="font-semibold text-card-foreground text-sm">{item.name}</p>
-                          <p className="text-primary font-bold mt-2">₱{item.price}</p>
+                          <div className="flex items-center justify-between">
+                            <p className="font-semibold  text-[#50606e] text-sm">{item.name}</p>
+                            <p className="text-[#266489] font-bold mt-2">₱{item.price}</p>
+                          </div>
                         </button>
                       ))}
                     </div>
@@ -135,24 +141,24 @@ export default function TabletOrderInterface() {
             </div>
           </div>
 
-          {/* Order Summary Section */}
-          <div className="elevation-1 bg-card rounded-2xl p-6 h-fit sticky top-6">
-            <h2 className="text-xl font-bold text-card-foreground mb-4">Order Summary</h2>
+          {/* Order Summary Section - fixed width column (360px on lg+) */}
+          <aside className="elevation-1 bg-[#ffffff] rounded-2xl p-6 h-fit sticky top-6">
+            <h2 className="text-xl font-bold text-[#266489] mb-4">Order Summary</h2>
 
             <div className="mb-4">
-              <label className="block text-sm font-medium text-card-foreground mb-2">Table Number</label>
+              <label className="block text-sm font-medium text-[#50606e] mb-2">Table Number</label>
               <input
                 type="text"
                 value={tableName}
                 onChange={(e) => setTableName(e.target.value)}
                 placeholder="e.g., T-1, T-2"
-                className="w-full px-3 py-2 bg-input border border-border rounded-lg text-card-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full px-3 py-2 bg-input border border-border rounded-lg text-[#50606e] placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
 
             <div className="mb-4 max-h-48 overflow-y-auto bg-muted/30 rounded-lg p-3">
               {cartItems.length === 0 ? (
-                <p className="text-muted-foreground text-sm">No items added</p>
+                <p className="text-[#50606e] text-sm">No items added</p>
               ) : (
                 cartItems.map((item) => (
                   <div
@@ -160,8 +166,8 @@ export default function TabletOrderInterface() {
                     className="flex justify-between items-center mb-3 pb-3 border-b border-border last:border-b-0"
                   >
                     <div className="flex-1">
-                      <p className="font-medium text-card-foreground text-sm">{item.name}</p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="font-medium text-[#50606e] text-sm">{item.name}</p>
+                      <p className="text-xs text-[#50606e]">
                         ₱{item.price} x {item.quantity}
                       </p>
                     </div>
@@ -169,15 +175,17 @@ export default function TabletOrderInterface() {
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         className="p-1 rounded hover:bg-primary/10"
+                        aria-label={`Decrease ${item.name}`}
                       >
-                        <Minus className="w-4 h-4 text-primary" />
+                        <Minus className="w-4 h-4 text-[#723522]" />
                       </button>
                       <span className="w-6 text-center text-sm font-semibold">{item.quantity}</span>
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         className="p-1 rounded hover:bg-primary/10"
+                        aria-label={`Increase ${item.name}`}
                       >
-                        <Plus className="w-4 h-4 text-primary" />
+                        <Plus className="w-4 h-4 text-[#723522]" />
                       </button>
                     </div>
                   </div>
@@ -206,20 +214,20 @@ export default function TabletOrderInterface() {
                 <span className="font-semibold text-card-foreground">₱{tax.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-lg font-bold pt-2 border-t border-border">
-                <span className="text-card-foreground">Total:</span>
-                <span className="text-primary">₱{total.toFixed(2)}</span>
+                <span className="text-[#266489]">Total:</span>
+                <span className="text-[#266489]">₱{total.toFixed(2)}</span>
               </div>
             </div>
 
             <button
               onClick={handleSubmitOrder}
               disabled={cartItems.length === 0 || !tableName}
-              className="w-full py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all elevation-1 flex items-center justify-center gap-2"
+              className="w-full py-3 bg-[#266489] text-[#ffffff] font-semibold rounded-lg hover:bg-[#50606e]  transition-all elevation-1 flex items-center justify-center gap-2"
             >
               <Send className="w-5 h-5" />
               Submit Order
             </button>
-          </div>
+          </aside>
         </div>
       </div>
     </div>

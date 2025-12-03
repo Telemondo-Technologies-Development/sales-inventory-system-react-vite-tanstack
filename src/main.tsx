@@ -10,9 +10,14 @@ import {
 import RootLayout from './routes/__root'
 import RootLogin from './routes/authlayout'
 import LoginPage from './routes/login'
-import Profile from './routes/profile'
+import SalesView from './routes/sales-view'
 import Index from './routes/index'
 import TabletOrderInterface from './routes/table-orders'
+import OrderView from './routes/order-view'
+import InventoryView from './routes/inventory-view'
+import AlertView from './routes/alert-view'
+import ExpensesView from './routes/expenses-view'
+
 import './styles.css'
 
 // ---- Single root route ----
@@ -38,10 +43,10 @@ const loginRoute = createRoute({
   component: LoginPage,
 })
 
-const profileRoute = createRoute({
+const salesViewRoute = createRoute({
   getParentRoute: () => appLayout,
-  path: '/profile',
-  component: Profile,
+  path: '/sales-view',
+  component: SalesView,
 })
 
 const indexRoute = createRoute({
@@ -56,10 +61,34 @@ const tabletOrderRoute = createRoute({
   component: TabletOrderInterface,
 })
 
+const orderViewRoute = createRoute({
+  getParentRoute: () => appLayout,
+  path: '/order-view',
+  component: OrderView,
+})
+
+const inventoryViewRoute = createRoute({
+  getParentRoute: () => appLayout,
+  path: '/inventory-view',
+  component: InventoryView,
+})
+
+const alertViewRoute = createRoute({
+  getParentRoute: () => appLayout,
+  path: '/alert-view',
+  component: AlertView,
+})
+
+const expensesViewRoute = createRoute({
+  getParentRoute: () => appLayout,
+  path: '/expenses-view',
+  component: ExpensesView,
+})
+
 // ---- Build route tree ----
 const routeTree = rootRoute.addChildren([
   loginLayout.addChildren([loginRoute]),
-  appLayout.addChildren([profileRoute, indexRoute, tabletOrderRoute]),
+  appLayout.addChildren([salesViewRoute, indexRoute, tabletOrderRoute, orderViewRoute, inventoryViewRoute, alertViewRoute, expensesViewRoute]),
 ])
 
 const router = createRouter({ routeTree })

@@ -25,7 +25,7 @@ export default function LoginPage() {
 
     if (user) {
       localStorage.setItem("currentUser", JSON.stringify(user))
-      router.navigate({ to: role === "admin" ? "/profile" : "/orders" })
+      router.navigate({ to: role === "admin" ? "/sales-view" : "/orders" })
     } else {
       setError("Invalid credentials. Try admin@restaurant.com / admin123 or employee@restaurant.com / emp123")
     }
@@ -33,10 +33,10 @@ export default function LoginPage() {
 
   return (
     <section className="min-h-screen from-primary via-background to-accent flex items-center justify-center ">
-      <div className="w-full max-w-md elevation-3 bg-[#ffffff] rounded-2xl p-8 ">
+      <div className="w-full max-w-md elevation-3 bg-[#f9f9ff] rounded-2xl p-8 ">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-[#575e71] mb-2">Restaurant</h1>
-          <h2 className="text-lg font-semibold text-muted-foreground">Management System</h2>
+          <h1 className="text-3xl font-bold text-[#266489] mb-2">Restaurant</h1>
+          <h2 className="text-lg font-semibold text-[#50606e]">Management System</h2>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-6 ">
@@ -75,7 +75,7 @@ export default function LoginPage() {
           </div>
 
           {error && (
-            <div className="flex items-start gap-3 p-4 bg-destructive/10 border border-destructive/30 rounded-lg">
+            <div className="flex items-start gap-3 p-4 bg-[#ffdad6] border border-[#583e5b] rounded-lg">
               <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
               <p className="text-sm text-destructive">{error}</p>
             </div>
@@ -83,7 +83,7 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            className="w-full py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-all elevation-1 active:elevation-2"
+            className="w-full py-3 bg-[#266489] text-[#ffffff] font-semibold rounded-lg hover:bg-[#50606e] transition-all elevation-1 active:elevation-2"
           >
             Sign In
           </button>
