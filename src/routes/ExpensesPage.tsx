@@ -2,19 +2,20 @@
 
 import React, { useEffect, useMemo, useState } from "react"
 import { Plus, Edit2, Trash2, Search } from "lucide-react"
-import { getExpenses, deleteExpense, getIngredients } from "@/lib/dexie"
-import ExpenseFormModal from "../../components/expenses-system/expenses-details"
-import type { ExpenseType } from "../../components/expenses-system/expenses-details"
+import { getExpenses, deleteExpense } from "../database/expenses-helper/ExpensesDexieDB"
+import { getIngredients } from "../database/inventory-helper/InventoryDexieDB"
+import ExpenseFormModal from "../components/expenses-system/ExpensesDetails"
+import type { Expense } from "../database/common/DexieDB"
 
 export default function ExpensesPage() {
-  const [expenses, setExpenses] = useState<ExpenseType[]>([])
+  const [expenses, setExpenses] = useState<Expense[]>([])
   const [loading, setLoading] = useState(true)
   const [query, setQuery] = useState("")
   const [supplierFilter, setSupplierFilter] = useState<string>("")
   const [dateFrom, setDateFrom] = useState<string>("")
   const [dateTo, setDateTo] = useState<string>("")
   const [showModal, setShowModal] = useState(false)
-  const [editing, setEditing] = useState<ExpenseType | null>(null)
+  const [editing, setEditing] = useState<Expense | null>(null)
 
   useEffect(() => {
     load()
@@ -24,7 +25,7 @@ export default function ExpensesPage() {
     setLoading(true)
     try {
       const rows = await getExpenses()
-      setExpenses(rows as ExpenseType[])
+      setExpenses(rows as Expense[])
     } catch (err) {
       console.error("Failed to load expenses", err)
       setExpenses([])
@@ -65,7 +66,7 @@ export default function ExpensesPage() {
     }
   }
 
-  const handleSaved = async (expense: ExpenseType) => {
+  const handleSaved = async (expense: Expense) => {
     await load()
     await refreshIngredients()
   }
@@ -134,7 +135,7 @@ export default function ExpensesPage() {
                 <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Cost (₱)</th>
                 <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Supplier</th>
                 <th className="sticky top-0 z-20 px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Notes</th>
-                <th className="sticky top-0 z-20  px-4 py-3 text-center text-sm font-semibold text-gray-600 border-b border-gray-200"></th>
+                <th className="sticky top-0 z-20  px-4 py-3 text-center text-sm font-semibold text-gray-600 border-b border-gray-200">Action</th>
               </tr>
             </thead>
 

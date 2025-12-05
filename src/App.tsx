@@ -6,8 +6,8 @@ import {
 } from '@tanstack/react-router'
 
 import Index from './routes/index'
-import Profile from './routes/sales-view'
-import LoginPage from './routes/login'
+import Profile from './routes/SalesView'
+import LoginPage from './routes/LoginPage'
 
 
 import RootLayout from './routes/__root'

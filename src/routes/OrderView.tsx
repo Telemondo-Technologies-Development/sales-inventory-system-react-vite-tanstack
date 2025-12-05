@@ -4,14 +4,13 @@ import { useState, useEffect, useCallback } from "react"
 import { CheckCircle2, Clock, CreditCard, Trash2, X } from "lucide-react"
 import {
   getOrders,
-  seedFromLocalStorageIfEmpty,
   updateOrderStatus as dbUpdateOrderStatus,
   deleteOrder as dbDeleteOrder,
   updateOrder as dbUpdateOrder,
   addPaymentRecord as dbAddPaymentRecord,
-} from "@/lib/dexie"
+} from "../database/order-helper/OrderDexieDB"
 
-import OrderDetailsModal from "../../components/order-system/order-details"
+import OrderDetailsModal from "../components/order-system/OrderDetails"
 
 interface OrderItem {
   id: string
@@ -59,8 +58,8 @@ export default function OrdersView() {
   }, [])
 
   useEffect(() => {
-    // seed from localStorage once (dev migration helper)
-    seedFromLocalStorageIfEmpty().then(loadOrders)
+    // initial load (no localStorage seeding)
+    loadOrders()
 
     // Subscribe to optimistic events dispatched by other components (e.g., TabletOrderInterface)
     const onOrdersUpdated = (e: Event) => {
@@ -93,18 +92,8 @@ export default function OrdersView() {
 
     window.addEventListener("orders-updated", onOrdersUpdated as EventListener)
 
-    // also listen to storage events (other tabs)
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === "orders") loadOrders()
-    }
-    window.addEventListener("storage", onStorage)
-
-    // initial load
-    loadOrders()
-
     return () => {
       window.removeEventListener("orders-updated", onOrdersUpdated as EventListener)
-      window.removeEventListener("storage", onStorage)
     }
   }, [loadOrders])
 
@@ -241,15 +230,15 @@ export default function OrdersView() {
           <div className="overflow-x-auto bg-white rounded-xl elevation-1 shadow-sm">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-[#fafafa]">
-                  <th className="px-3 py-2 text-left">Order</th>
-                  <th className="px-3 py-2 text-left">Table</th>
-                  <th className="px-3 py-2 text-left">Total</th>
-                  <th className="px-3 py-2 text-left">Paid</th>
-                  <th className="px-3 py-2 text-left">Balance</th>
-                  <th className="px-3 py-2 text-left">Last Payment</th>
-                  <th className="px-3 py-2 text-left">Status</th>
-                  <th className="px-3 py-2 text-center">Actions</th>
+                <tr className="bg-gray-100">
+                  <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Order</th>
+                  <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Table</th>
+                  <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Total</th>
+                  <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Paid</th>
+                  <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Balance</th>
+                  <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Last Payment</th>
+                  <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Payment Method</th>
+                  <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -257,6 +246,7 @@ export default function OrdersView() {
                   const paid = paidAmount(o)
                   const balance = balanceAmount(o)
                   const lastPayment = (o.paymentRecords || []).slice(-1)[0]
+
                   return (
                     <tr key={o.id} className="border-t hover:bg-gray-50">
                       <td className="px-3 py-2">{o.id}</td>
@@ -265,7 +255,18 @@ export default function OrdersView() {
                       <td className="px-3 py-2">₱{paid.toFixed(2)}</td>
                       <td className="px-3 py-2">₱{balance.toFixed(2)}</td>
                       <td className="px-3 py-2">{lastPayment ? new Date(lastPayment.createdAt).toLocaleString() : "-"}</td>
-                      <td className="px-3 py-2">{o.status}</td>
+
+                      {/* Payment Method column: show last payment method or a clear "No payments yet" statement */}
+                      <td className="px-3 py-2">
+                        {lastPayment ? (
+                          <span className="inline-flex items-center gap-2 px-2 py-1 rounded-full bg-gray-100 text-sm font-medium text-gray-700">
+                            <span className="uppercase">{lastPayment.method}</span>
+                          </span>
+                        ) : (
+                          <span className="text-sm italic text-gray-500">No payments yet</span>
+                        )}
+                      </td>
+
                       <td className="px-3 py-2 text-center">
                         <div className="inline-flex gap-2">
                           <button

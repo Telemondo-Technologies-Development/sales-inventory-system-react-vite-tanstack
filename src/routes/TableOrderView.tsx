@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Plus, Minus, Send } from "lucide-react"
 import { useNavigate } from "@tanstack/react-router"
-import { addOrder } from "@/lib/dexie"
+import { addOrder } from "../database/order-helper/OrderDexieDB"
 
 interface MenuItem {
   id: string
@@ -18,16 +18,16 @@ interface OrderItem {
   quantity: number
 }
 
-export default function TabletOrderInterface() {
+export default function TableOrderView() {
   const navigate = useNavigate()
 
   const [menuItems] = useState<MenuItem[]>([
-    { id: "1", name: "Burger", price: 120, category: "Main", image: "/classic-beef-burger.png" },
-    { id: "2", name: "Pizza", price: 180, category: "Main", image: "/delicious-pizza.png" },
-    { id: "3", name: "Fries", price: 80, category: "Sides", image: "/golden-crispy-fries.png" },
-    { id: "4", name: "Soda", price: 50, category: "Drinks", image: "/assorted-soda-cans.png" },
-    { id: "5", name: "Ice Cream", price: 60, category: "Desserts", image: "/colorful-ice-cream-cones.png" },
-    { id: "6", name: "Salad", price: 100, category: "Main", image: "/vibrant-mixed-salad.png" },
+    { id: "1", name: "Burger", price: 120, category: "Main", image: "/menu-pictures/Burger.webp"  },
+    { id: "2", name: "Pizza", price: 180, category: "Main", image: "/menu-pictures/Pizza.webp" },
+    { id: "3", name: "Fries", price: 80, category: "Sides", image: "/menu-pictures/Fries.webp" },
+    { id: "4", name: "Coke", price: 50, category: "Drinks", image: "/menu-pictures/Coke.webp" },
+    { id: "5", name: "Halo-Halo", price: 60, category: "Desserts", image: "/menu-pictures/Halo-halo.webp" },
+    { id: "6", name: "Salad", price: 100, category: "Main", image: "/menu-pictures/Salad.webp" },
   ])
 
   const [cartItems, setCartItems] = useState<OrderItem[]>([])
@@ -107,10 +107,10 @@ export default function TabletOrderInterface() {
           <h1 className="text-3xl font-semibold text-[#266489] ">Menu</h1>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_360px]">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_360px] ">
           {/* Menu Section - flexible column (takes remaining width) */}
           <div>
-            <div className="elevation-1 bg-[#ffffff] rounded-2xl p-6 ">
+            <div className="elevation-1 bg-[#ffffff] rounded-2xl p-6  ">
               {categories.map((category) => {
                 const categoryItems = menuItems.filter((m) => m.category === category)
                 return (
@@ -121,12 +121,12 @@ export default function TabletOrderInterface() {
                         <button
                           key={item.id}
                           onClick={() => addToCart(item)}
-                          className="elevation-1 bg-card border border-[#c1c7ce] rounded-xl p-4 hover:elevation-2 hover:border-[#50606e] transition-all group text-left"
+                          className="elevation-1 bg-card border border-[#c1c7ce] rounded-xl p-4 hover:elevation-2 hover:border-[#50606e] transition-all group text-left cursor-pointer"
                         >
                           <img
                             src={item.image || "/placeholder.svg"}
                             alt={item.name}
-                            className="w-full h-24 object-cover rounded-lg mb-3"
+                            className="w-max h-24 object-cover rounded-lg mb-3 mx-auto"
                           />
                           <div className="flex items-center justify-between">
                             <p className="font-semibold  text-[#50606e] text-sm">{item.name}</p>

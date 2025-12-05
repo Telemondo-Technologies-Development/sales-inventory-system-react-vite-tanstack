@@ -6,10 +6,8 @@ import {
   getIngredients,
   updateIngredient as dbUpdateIngredient,
   deleteIngredient as dbDeleteIngredient,
-  seedFromLocalStorageIfEmpty,
-  getExpenses,
-} from "@/lib/dexie"
-import ExpenseModal from "../../components/inventory-system/inventory-details"
+} from "../database/inventory-helper/InventoryDexieDB"
+import ExpenseModal from "../components/inventory-system/InventoryDetails"
 
 interface Ingredient {
   id: string
@@ -31,7 +29,6 @@ export default function InventoryView() {
   useEffect(() => {
     ;(async () => {
       setLoading(true)
-      await seedFromLocalStorageIfEmpty()
       await loadIngredients()
       setLoading(false)
     })()
@@ -86,8 +83,19 @@ export default function InventoryView() {
 
   return (
     <div className="p-8">
-      <div className="flex justify-between items-center mb-[16px] bg-white rounded-xl p-4 shadow-md border border-gray-200">
+      <div className="flex justify-between items-center mb-6 bg-white rounded-xl p-4 shadow-md border border-gray-200">
         <h1 className="text-3xl font-bold text-[#266489]">Inventory Management</h1>
+
+        <div className="flex items-center">
+          <button
+            onClick={() => setShowExpenseModal(true)}
+            className="ml-3 flex items-center gap-2 px-4 py-2 bg-[#266489] text-white rounded-lg hover:bg-[#3a4a78] transition"
+            aria-haspopup="dialog"
+          >
+            <Plus className="w-4 h-4" />
+            Add Expense
+          </button>
+        </div>
       </div>
 
       {/* Low Stock Alerts */}
@@ -114,12 +122,12 @@ export default function InventoryView() {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="px-6 py-4 text-left font-bold text-[#333]">Ingredient</th>
-                <th className="px-6 py-4 text-left font-bold text-[#333]">Quantity</th>
-                <th className="px-6 py-4 text-left font-bold text-[#333]">Min Threshold</th>
-                <th className="px-6 py-4 text-left font-bold text-[#333]">Status</th>
-                <th className="px-6 py-4 text-center font-bold text-[#333]">Actions</th>
+              <tr className=" border-gray-100">
+                <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Ingredient</th>
+                <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Quantity</th>
+                <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Min Threshold</th>
+                <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Status</th>
+                <th className="sticky top-0 z-20  px-4 py-3 text-center text-sm font-semibold text-gray-600 border-b border-gray-200">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -135,39 +143,39 @@ export default function InventoryView() {
                       key={ingredient.id}
                       className={`border-b border-gray-100 hover:bg-gray-50 hover:shadow-sm transition-all ${isLow ? "bg-red-50" : "bg-white"}`}
                     >
-                      <td className="px-6 py-4 font-semibold text-[#222]">
+                      <td className="px-6 py-4  text-gray-500 text-sm">
                         {editingId === ingredient.id ? (
                           <input
                             type="text"
                             value={editForm.name ?? ingredient.name}
                             onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                            className="px-2 py-1 bg-gray-50 border border-gray-200 rounded text-[#222]"
+                            className="px-2 py-1 bg-gray-50 border border-gray-200 rounded text-gray-500 text-sm"
                           />
                         ) : (
                           ingredient.name
                         )}
                       </td>
-                      <td className="px-6 py-4 text-[#222]">
+                      <td className="px-6 py-4 text-gray-500">
                         {editingId === ingredient.id ? (
                           <input
                             type="number"
                             value={editForm.quantity ?? ingredient.quantity}
                             min={0}
                             onChange={(e) => setEditForm({ ...editForm, quantity: Number(e.target.value || 0) })}
-                            className="px-2 py-1 bg-gray-50 border border-gray-200 rounded text-[#222] w-24"
+                            className="px-2 py-1 bg-gray-50 border border-gray-200 rounded text-gray-500 w-24 text-sm"
                           />
                         ) : (
                           `${ingredient.quantity} ${ingredient.unit}`
                         )}
                       </td>
-                      <td className="px-6 py-4 text-[#222]">
+                      <td className="px-6 py-4 text-gray-500 text-sm">
                         {editingId === ingredient.id ? (
                           <input
                             type="number"
                             value={editForm.minThreshold ?? ingredient.minThreshold}
                             min={0}
                             onChange={(e) => setEditForm({ ...editForm, minThreshold: Number(e.target.value || 0) })}
-                            className="px-2 py-1 bg-gray-50 border border-gray-200 rounded text-[#222] w-24"
+                            className="px-2 py-1 bg-gray-50 border border-gray-200 rounded text-gray-500 w-24 text-sm" 
                           />
                         ) : (
                           `${ingredient.minThreshold} ${ingredient.unit}`
@@ -232,6 +240,19 @@ export default function InventoryView() {
           </table>
         </div>
       </div>
+
+      {/* Expense modal (sibling, not inside button) */}
+      <ExpenseModal
+        open={showExpenseModal}
+        onClose={() => setShowExpenseModal(false)}
+        onSaved={async (expense) => {
+          // reload ingredients after expense added (expenses handler already updates inventory)
+          await loadIngredients()
+          // optionally reload expenses list if you show it somewhere
+          console.info("Saved expense", expense)
+          setShowExpenseModal(false)
+        }}
+      />
     </div>
   )
 }

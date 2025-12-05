@@ -1,18 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { X } from "lucide-react"
-import { addExpense } from "@/lib/dexie"
-
-export type Expense = {
-  id: string
-  item: string
-  quantity: number
-  unit: string
-  unitWeight?: string
-  cost: number
-  supplier?: string
-  date: string
-  notes?: string
-}
+import { addExpense } from "../../database/expenses-helper/ExpensesDexieDB"
+import type { Expense } from "../../database/common/DexieDB"
 
 type Props = {
   open: boolean
@@ -25,7 +14,7 @@ type Props = {
  * - centered modal, inner content scrolls if long
  * - records an expense to Dexie via addExpense()
  */
-export default function ExpenseModal({ open, onClose, onSaved }: Props) {
+export default function InventoryDetails({ open, onClose, onSaved }: Props) {
   const [item, setItem] = useState("")
   const [quantity, setQuantity] = useState<number>(1)
   const [unit, setUnit] = useState<string>("bag")
@@ -72,7 +61,7 @@ export default function ExpenseModal({ open, onClose, onSaved }: Props) {
 
     setSaving(true)
     try {
-      await addExpense(expense as any) // addExpense expects Expense type from dexie module
+      await addExpense(expense as any) // runtime function from expenses-helper
       onSaved?.(expense)
       onClose()
     } catch (err) {

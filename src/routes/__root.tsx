@@ -9,6 +9,7 @@ import {
   View,
   Archive,
   DollarSign,
+  House
 } from "lucide-react"
 
 export default function RootLayout() {
@@ -57,12 +58,6 @@ export default function RootLayout() {
   // pick a readable inactive color (neutral)
   const inactiveHex = "#181c20" // gray-500-ish
 
-  /**
-   * Typed NavLink with active styling.
-   * When active:
-   *  - apply a subtle background and extra horizontal padding
-   *  - keep icon+label using the active color
-   */
   type NavLinkProps = {
     to: string
     children: React.ReactNode
@@ -73,9 +68,7 @@ export default function RootLayout() {
     const isActive = pathname === to || pathname.startsWith(to + "/")
     const color = isActive ? primaryHex : inactiveHex
 
-    // base classes for link
     const base = "group/nav relative flex items-center gap-3 w-full text-sm font-semibold rounded transition-colors duration-150"
-    // when active, add bg/padding as requested
     const activeExtras = isActive ? "bg-[#eaf4f8] px-3 py-2 rounded-md shadow-sm" : "px-2 py-2"
 
     return (
@@ -87,7 +80,6 @@ export default function RootLayout() {
         className={`${base} ${activeExtras}`}
       >
         <div className="flex items-center justify-center w-8 h-8">
-          {/* icon uses currentColor so it matches the text color */}
           <Icon style={{ color: "currentColor" }} className="w-5 h-5" />
         </div>
 
@@ -124,9 +116,9 @@ export default function RootLayout() {
         </div>
       </header>
 
-      {/* desktop sidebar */}
+      {/* desktop sidebar - part of document flow so it PUSHES main content */}
       <aside
-        className="hidden md:flex fixed left-0 top-0 h-full w-16 hover:w-[220px] group bg-white text-gray-800 border-r border-gray-200 transition-[width] duration-200 ease-in-out overflow-hidden"
+        className="hidden md:flex sticky top-0 h-screen w-16 hover:w-[220px] group bg-white text-gray-800 border-r border-gray-200 transition-[width] duration-200 ease-in-out overflow-hidden"
         aria-label="Main navigation"
       >
         <div className="flex flex-col h-full w-full">
@@ -140,24 +132,12 @@ export default function RootLayout() {
           </div>
 
           <nav className="mt-4 px-2 flex flex-col gap-2 ">
-            <NavLink to="/index" Icon={UserRoundPen}>
-              Home
-            </NavLink>
-            <NavLink to="/sales-view" Icon={UserRoundPen}>
-              Sales
-            </NavLink>
-            <NavLink to="/table-orders" Icon={ListOrdered}>
-              Table Orders
-            </NavLink>
-            <NavLink to="/order-view" Icon={View}>
-              Order View
-            </NavLink>
-            <NavLink to="/inventory-view" Icon={Archive}>
-              Inventory View
-            </NavLink>
-            <NavLink to="/expenses-view" Icon={DollarSign}>
-              Expenses
-            </NavLink>
+            <NavLink to="/index" Icon={House}>Home</NavLink>
+            <NavLink to="/sales-view" Icon={UserRoundPen}>Sales</NavLink>
+            <NavLink to="/table-orders" Icon={ListOrdered}>Table Orders</NavLink>
+            <NavLink to="/order-view" Icon={View}>Order View</NavLink>
+            <NavLink to="/inventory-view" Icon={Archive}>Inventory View</NavLink>
+            <NavLink to="/expenses-view" Icon={DollarSign}>Expenses</NavLink>
           </nav>
 
           <div className="mt-auto px-2 py-4">
@@ -172,7 +152,7 @@ export default function RootLayout() {
         </div>
       </aside>
 
-      {/* mobile overlay & menu */}
+      {/* mobile overlay & menu (unchanged) */}
       <div
         className={`md:hidden fixed inset-0 z-50 transition-opacity ${isMobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
         aria-hidden={!isMobileOpen}
@@ -190,24 +170,12 @@ export default function RootLayout() {
           </div>
 
           <nav className="flex flex-col gap-2">
-            <NavLink to="/index" Icon={UserRoundPen}>
-              Home
-            </NavLink>
-            <NavLink to="/sales-view" Icon={UserRoundPen}>
-              Sales
-            </NavLink>
-            <NavLink to="/table-orders" Icon={ListOrdered}>
-              Table Orders
-            </NavLink>
-            <NavLink to="/order-view" Icon={View}>
-              Order View
-            </NavLink>
-            <NavLink to="/inventory-view" Icon={Archive}>
-              Inventory View
-            </NavLink>
-            <NavLink to="/expenses-view" Icon={DollarSign}>
-              Expenses
-            </NavLink>
+            <NavLink to="/index" Icon={UserRoundPen}>Home</NavLink>
+            <NavLink to="/sales-view" Icon={UserRoundPen}>Sales</NavLink>
+            <NavLink to="/table-orders" Icon={ListOrdered}>Table Orders</NavLink>
+            <NavLink to="/order-view" Icon={View}>Order View</NavLink>
+            <NavLink to="/inventory-view" Icon={Archive}>Inventory View</NavLink>
+            <NavLink to="/expenses-view" Icon={DollarSign}>Expenses</NavLink>
           </nav>
 
           <div className="mt-auto pt-6">
@@ -219,7 +187,8 @@ export default function RootLayout() {
         </div>
       </div>
 
-      <main className="flex-1 min-h-screen transition-all duration-200" style={{ backgroundColor: "#f1f4f9", marginLeft: 80 }}>
+      {/* main no longer needs marginLeft; it will be pushed by the sidebar's width */}
+      <main className="flex-1 min-h-screen transition-all duration-200 pt-14 md:pt-6" style={{ backgroundColor: "#f1f4f9" }}>
         <div className="p-6 md:pt-6">
           <Outlet />
         </div>

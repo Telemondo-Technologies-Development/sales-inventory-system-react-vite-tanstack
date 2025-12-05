@@ -148,12 +148,12 @@ export default function OrderDetails({
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
 
       {/* modal panel: centered; inner content scrolls if it overflows */}
-      <div className="relative z-10 w-full max-w-3xl">
-        <div className="bg-white rounded-xl shadow-lg border border-[#e8e8ec] overflow-hidden">
-          <div className="flex items-center justify-between p-4 border-b border-[#f0f0f3]">
+      <div className="relative z-10 w-full max-w-4xl">
+        <div className="bg-white rounded-2xl elevation-1 overflow-hidden">
+          <div className="flex items-center justify-between p-4 ">
             <div>
-              <h2 className="text-lg font-bold text-[#723522]">Order {order.id}</h2>
-              <p className="text-sm text-[#6b6b73]">
+              <h2 className="text-lg font-bold text-[#266489]">Order {order.id}</h2>
+              <p className="text-sm text-[#72787e]">
                 Table {order.tableNumber} · {new Date(order.createdAt).toLocaleString()}
               </p>
             </div>
@@ -167,13 +167,13 @@ export default function OrderDetails({
           <div className="p-6 max-h-[80vh] overflow-auto space-y-4">
             {/* Items editor */}
             <div>
-              <h3 className="text-sm font-semibold text-[#5d4037] mb-2">Items</h3>
-              <div className="divide-y divide-[#f0f0f3] rounded-md overflow-hidden border border-[#f5f5f7]">
+              <h3 className="text-sm font-semibold text-[#266489] mb-2">Items</h3>
+              <div className="divide-y divide-[#f0f0f3] rounded-md overflow-hidden elevation-1]">
                 {draft.items.map((it) => (
                   <div key={it.id} className="flex items-center justify-between px-4 py-3 bg-white">
                     <div className="flex-1">
-                      <div className="font-medium text-sm text-[#333]">{it.name}</div>
-                      <div className="text-xs text-[#777]">₱{it.price.toFixed(2)}</div>
+                      <div className="font-medium text-sm text-[##72787e]">{it.name}</div>
+                      <div className="text-xs text-[#72787e]">₱{it.price.toFixed(2)}</div>
                     </div>
                     <div className="flex items-center gap-2">
                       <input
@@ -187,7 +187,7 @@ export default function OrderDetails({
                       <div className="font-semibold">₱{(it.price * it.quantity).toFixed(2)}</div>
                       <button
                         onClick={() => handleRemoveItem(it.id)}
-                        className="ml-2 p-2 rounded hover:bg-red-50 text-red-600"
+                        className="ml-2 p-2 rounded hover:bg-red-50 text-[#ba1a1a]"
                         aria-label={`Remove ${it.name}`}
                         title="Remove item"
                       >
@@ -199,19 +199,19 @@ export default function OrderDetails({
               </div>
 
               {/* Add item small form */}
-              <div className="mt-3 grid grid-cols-1 sm:grid-cols-4 gap-2 items-end">
+              <div className="mt-3 grid grid-cols-1 sm:grid-cols-4 gap-2 items-start">
                 <input
                   placeholder="Item name"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  className="px-3 py-2 border rounded col-span-2"
+                  className="px-3 py-2 border rounded-2xl col-span-2"
                 />
                 <input
                   type="number"
                   placeholder="Price"
                   value={newPrice || ""}
                   onChange={(e) => setNewPrice(Number(e.target.value))}
-                  className="px-3 py-2 border rounded"
+                  className="px-3 py-2 border rounded-2xl"
                 />
                 <div className="flex items-center gap-2">
                   <input
@@ -219,9 +219,9 @@ export default function OrderDetails({
                     min={1}
                     value={newQty}
                     onChange={(e) => setNewQty(Number(e.target.value))}
-                    className="w-20 px-3 py-2 border rounded"
+                    className="w-20 px-3 py-2 border rounded-2xl"
                   />
-                  <button onClick={handleAddItem} className="px-3 py-2 bg-[#8f4c37] text-white rounded">
+                  <button onClick={handleAddItem} className="px-10 py-2 bg-[#266489] text-white rounded">
                     Add
                   </button>
                 </div>
@@ -251,13 +251,13 @@ export default function OrderDetails({
               </div>
               <div className="p-3 bg-white rounded border border-[#f0f0f3]">
                 <div className="text-xs text-[#6b6b73]">Total</div>
-                <div className="text-lg font-bold text-[#8f4c37]">₱{draft.total.toFixed(2)}</div>
+                <div className="text-lg font-bold text-[#266489]">₱{draft.total.toFixed(2)}</div>
               </div>
             </div>
 
             {/* Payments table */}
             <div>
-              <h3 className="text-sm font-semibold text-[#5d4037] mb-2">Payments</h3>
+              <h3 className="text-sm font-semibold text-[#266489] mb-2">Payments</h3>
               <div className="overflow-x-auto rounded border border-[#f5f5f7]">
                 <table className="w-full text-sm">
                   <thead>
@@ -289,11 +289,11 @@ export default function OrderDetails({
               </div>
 
               {/* Payment form */}
-              <div className="mt-3 grid grid-cols-1 sm:grid-cols-4 gap-2 items-end">
+              <div className="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-[16px] items-center">
                 <select
                   value={payMethod}
                   onChange={(e) => setPayMethod(e.target.value as PaymentRecord["method"])}
-                  className="px-3 py-2 border rounded"
+                  className="px-3 py-2 border rounded-2xl"
                 >
                   <option>Cash</option>
                   <option>Card</option>
@@ -304,19 +304,19 @@ export default function OrderDetails({
                   value={payAmount || ""}
                   onChange={(e) => setPayAmount(Number(e.target.value))}
                   placeholder="Amount"
-                  className="px-3 py-2 border rounded"
+                  className="px-3 py-2 border rounded-2xl"
                 />
                 <input
                   value={payRef}
                   onChange={(e) => setPayRef(e.target.value)}
                   placeholder="Reference (required for Cash/Card)"
-                  className="px-3 py-2 border rounded"
+                  className="px-3 py-2 border rounded-2xl"
                 />
-                <div className="flex gap-2">
-                  <button onClick={handleAddPayment} className="px-3 py-2 bg-[#445e91] text-white rounded">
+                <div className="flex gap-6">
+                  <button onClick={handleAddPayment} className="px-10 bg-[#266489] text-white rounded-2xl">
                     Record Payment
                   </button>
-                  <button onClick={handleSaveEdits} className="px-3 py-2 bg-[#8f4c37] text-white rounded">
+                  <button onClick={handleSaveEdits} className="px-10 bg-[#64597b] text-white rounded-2xl">
                     Save Changes
                   </button>
                 </div>
@@ -331,7 +331,7 @@ export default function OrderDetails({
                   onUpdateStatus(draft.id, "served")
                   onClose()
                 }}
-                className="py-2 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                    className="py-2 px-4 bg-[#266489] text-white rounded-2xl hover:bg-[#50606e] transition"
               >
                 Mark Served
               </button>
@@ -343,7 +343,7 @@ export default function OrderDetails({
                   onUpdateStatus(draft.id, "payment")
                   onClose()
                 }}
-                className="py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="py-2 px-4 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition"
               >
                 Request Payment
               </button>

@@ -1,12 +1,13 @@
 "use client"
 
 import React, { useEffect, useMemo, useState } from "react"
-import { getOrders, getExpenses } from "@/lib/dexie"
+import { getExpenses } from "../database/expenses-helper/ExpensesDexieDB"
+import { getOrders } from "../database/order-helper/OrderDexieDB"
 import {
   RevenueLineChart,
   SalesBarChart,
   TopItemsPie,
-} from "../../components/sales-system/sales-details"
+} from "../components/sales-system/SalesDetails"
 
 type OrderItem = {
   id: string
@@ -40,7 +41,7 @@ type Expense = {
   notes?: string
 }
 
-export default function DashboardPage() {
+export default function SalesView() {
   const [orders, setOrders] = useState<Order[]>([])
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [loading, setLoading] = useState(true)

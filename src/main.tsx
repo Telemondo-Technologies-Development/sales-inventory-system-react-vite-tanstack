@@ -9,14 +9,14 @@ import {
 
 import RootLayout from './routes/__root'
 import RootLogin from './routes/authlayout'
-import LoginPage from './routes/login'
-import SalesView from './routes/sales-view'
+import LoginPage from './routes/LoginPage'
+import SalesView from './routes/SalesView'
 import Index from './routes/index'
-import TabletOrderInterface from './routes/table-orders'
-import OrderView from './routes/order-view'
-import InventoryView from './routes/inventory-view'
+import TabletOrderInterface from './routes/TableOrderView'
+import OrderView from './routes/OrderView'
+import InventoryView from './routes/InventoryView'
 import AlertView from './routes/alert-view'
-import ExpensesView from './routes/expenses-view'
+import ExpensesView from './routes/ExpensesPage'
 
 import './styles.css'
 

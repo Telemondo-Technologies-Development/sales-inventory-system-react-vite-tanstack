@@ -2,32 +2,22 @@
 
 import React, { useEffect, useState } from "react"
 import { X } from "lucide-react"
-import { addExpense, updateExpense } from "@/lib/dexie"
-
-export type ExpenseType = {
-  id: string
-  item: string
-  quantity: number
-  unit: string
-  unitWeight?: string
-  cost: number
-  supplier?: string
-  date: string
-  notes?: string
-}
+import { addExpense, updateExpense } from "../../database/expenses-helper/ExpensesDexieDB"
+import type { Expense } from "../../database/common/DexieDB"
 
 type Props = {
   open: boolean
-  initial?: ExpenseType | null
+  initial?: Expense | null
   onClose: () => void
-  onSaved?: (expense: ExpenseType) => void
+  onSaved?: (expense: Expense) => void
 }
 
 /**
  * Reusable form modal for creating or editing an expense.
- * If `initial` is provided, the form acts as edit; otherwise create.
+ * - If `initial` is provided, the form acts as edit; otherwise create.
+ * - Uses the Expense type exported from the central DexieDB common module.
  */
-export default function ExpenseFormModal({ open, initial = null, onClose, onSaved }: Props) {
+export default function ExpensesDetails({ open, initial = null, onClose, onSaved }: Props) {
   const [item, setItem] = useState("")
   const [quantity, setQuantity] = useState<number>(1)
   const [unit, setUnit] = useState<string>("bag")
@@ -69,7 +59,7 @@ export default function ExpenseFormModal({ open, initial = null, onClose, onSave
     if (quantity <= 0) return alert("Quantity must be at least 1.")
     if (cost <= 0) return alert("Cost must be greater than zero.")
 
-    const expense: ExpenseType = {
+    const expense: Expense = {
       id: initial?.id ?? `exp-${Date.now()}`,
       item: item.trim(),
       quantity,
@@ -84,9 +74,9 @@ export default function ExpenseFormModal({ open, initial = null, onClose, onSave
     setSaving(true)
     try {
       if (initial) {
-        await updateExpense(expense as any)
+        await updateExpense(expense)
       } else {
-        await addExpense(expense as any)
+        await addExpense(expense)
       }
       onSaved?.(expense)
       onClose()
@@ -104,7 +94,7 @@ export default function ExpenseFormModal({ open, initial = null, onClose, onSave
       <div className="relative z-10 w-full max-w-xl">
         <div className="bg-white rounded-xl shadow-lg border border-[#e8e8ec] overflow-hidden">
           <div className="flex items-center justify-between p-4 border-b">
-            <h3 className="text-lg font-semibold">{initial ? "Edit Expense" : "Record Expense"}</h3>
+            <h3 className="text-lg font-semibold text-[#256489]">{initial ? "Edit Expense" : "Record Expense"}</h3>
             <button onClick={onClose} className="p-2 rounded hover:bg-gray-100"><X /></button>
           </div>
 
@@ -154,7 +144,7 @@ export default function ExpenseFormModal({ open, initial = null, onClose, onSave
 
           <div className="flex items-center justify-end gap-2 p-4 border-t">
             <button onClick={onClose} className="py-2 px-4 bg-white border rounded">Cancel</button>
-            <button onClick={handleSave} disabled={saving} className="py-2 px-4 bg-[#8f4c37] text-white rounded">
+            <button onClick={handleSave} disabled={saving} className="py-2 px-4 bg-[#256489] text-white rounded">
               {saving ? "Saving…" : initial ? "Save Changes" : "Save Expense"}
             </button>
           </div>
