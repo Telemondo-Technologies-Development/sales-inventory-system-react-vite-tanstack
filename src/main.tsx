@@ -7,16 +7,16 @@ import {
   RouterProvider,
 } from '@tanstack/react-router'
 
-import RootLayout from './routes/__root'
-import RootLogin from './routes/authlayout'
-import LoginPage from './routes/LoginPage'
-import SalesView from './routes/SalesView'
+import RootLayout from './routes/common/__root'
+import RootLogin from './routes/common/authlayout'
+import LoginPage from './routes/login-page'
+import SalesView from './routes/sales-view'
 import Index from './routes/index'
-import TabletOrderInterface from './routes/TableOrderView'
-import OrderView from './routes/OrderView'
-import InventoryView from './routes/InventoryView'
+import TabletOrderInterface from './routes/table-order-view'
+import OrderView from './routes/order-view'
+import InventoryView from './routes/inventory-view'
 import AlertView from './routes/alert-view'
-import ExpensesView from './routes/ExpensesPage'
+import ExpensesView from './routes/expenses-view'
 
 import './styles.css'
 

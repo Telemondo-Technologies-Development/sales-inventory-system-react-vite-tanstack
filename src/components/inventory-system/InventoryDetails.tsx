@@ -61,7 +61,7 @@ export default function InventoryDetails({ open, onClose, onSaved }: Props) {
 
     setSaving(true)
     try {
-      await addExpense(expense as any) // runtime function from expenses-helper
+      await addExpense(expense as any) // runtime function from expenses-helper  avoid using any
       onSaved?.(expense)
       onClose()
     } catch (err) {

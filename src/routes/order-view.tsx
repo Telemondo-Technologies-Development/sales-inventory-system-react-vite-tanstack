@@ -1,6 +1,7 @@
+"use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { CheckCircle2, Clock, CreditCard, Trash2, X } from "lucide-react"
+import { CheckCircle2, Clock, CreditCard, Trash2 } from "lucide-react"
 import {
   getOrders,
   updateOrderStatus as dbUpdateOrderStatus,
@@ -57,43 +58,8 @@ export default function OrdersView() {
   }, [])
 
   useEffect(() => {
-    // initial load (no localStorage seeding)
+    // initial load only; no global event listener
     loadOrders()
-
-    // Subscribe to optimistic events dispatched by other components (e.g., TabletOrderInterface)
-    const onOrdersUpdated = (e: Event) => {
-      const detail = (e as CustomEvent).detail
-      if (!detail) return
-
-      const { action } = detail
-
-      if (action === "add" && detail.optimistic && detail.order) {
-        // Optimistically add the order locally immediately (no DB read)
-        setOrders((prev) => [detail.order, ...prev])
-        return
-      }
-
-      if (action === "confirm") {
-        // a write succeeded; reload authoritative state from DB
-        loadOrders()
-        return
-      }
-
-      if (action === "rollback" && detail.orderId) {
-        // remove the optimistic order (roll back)
-        setOrders((prev) => prev.filter((o) => o.id !== detail.orderId))
-        return
-      }
-
-      // fallback: reload
-      loadOrders()
-    }
-
-    window.addEventListener("orders-updated", onOrdersUpdated as EventListener)
-
-    return () => {
-      window.removeEventListener("orders-updated", onOrdersUpdated as EventListener)
-    }
   }, [loadOrders])
 
   const updateOrderStatus = async (orderId: string, newStatus: Order["status"]) => {
@@ -102,7 +68,7 @@ export default function OrdersView() {
 
     try {
       await dbUpdateOrderStatus(orderId, newStatus)
-      window.dispatchEvent(new CustomEvent("orders-updated", { detail: { action: "confirm", orderId } }))
+      // authoritative state will be reflected when you call loadOrders where needed
     } catch (err) {
       console.error("Failed to update order status:", err)
       setOrders(prev)
@@ -116,7 +82,7 @@ export default function OrdersView() {
 
     try {
       await dbDeleteOrder(orderId)
-      window.dispatchEvent(new CustomEvent("orders-updated", { detail: { action: "confirm", orderId } }))
+      // DB changed; reload when needed
     } catch (err) {
       console.error("Failed to delete order:", err)
       setOrders(prev)
@@ -131,7 +97,7 @@ export default function OrdersView() {
 
     try {
       await dbUpdateOrder(edited)
-      window.dispatchEvent(new CustomEvent("orders-updated", { detail: { action: "confirm", orderId: edited.id } }))
+      // DB changed; reload when needed
     } catch (err) {
       console.error("Failed to save order edits:", err)
       setOrders(prev)
@@ -149,7 +115,7 @@ export default function OrdersView() {
 
     try {
       await dbAddPaymentRecord(orderId, payment)
-      window.dispatchEvent(new CustomEvent("orders-updated", { detail: { action: "confirm", orderId } }))
+      // DB changed; reload when needed
     } catch (err) {
       console.error("Failed to add payment:", err)
       setOrders(prev)

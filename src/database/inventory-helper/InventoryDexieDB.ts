@@ -1,5 +1,17 @@
 import { db, normalizeName } from "../common/DexieDB"
-import type { Ingredient } from "../common/DexieDB"
+
+
+
+export interface Ingredient {
+  id: string
+  name: string
+  quantity: number
+  unit: string
+  minThreshold: number
+  lastUpdated: string
+}
+
+
 
 export const getIngredients = async (): Promise<Ingredient[]> => db.ingredients.orderBy("name").toArray()
 export const addIngredient = async (ingredient: Ingredient) => db.ingredients.add(ingredient)

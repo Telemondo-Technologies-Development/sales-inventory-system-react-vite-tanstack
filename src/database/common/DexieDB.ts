@@ -1,60 +1,9 @@
 import Dexie from "dexie"
+import type { Order } from "../order-helper/OrderDexieDB"
+import type { Ingredient } from "../inventory-helper/InventoryDexieDB"
+import type { Expense } from "../expenses-helper/ExpensesDexieDB"
 
-/* ---- Types ---- */
-export interface OrderItem {
-  id: string
-  name: string
-  price: number
-  quantity: number
-}
 
-export interface PaymentRecord {
-  id: string
-  method: "Cash" | "Card" | "Online"
-  amount: number
-  reference?: string
-  createdAt: string
-}
-
-export interface Order {
-  id: string
-  tableNumber: string
-  items: OrderItem[]
-  notes: string
-  status: "pending" | "served" | "payment"
-  createdAt: string
-  subtotal: number
-  tax: number
-  total: number
-  paymentRecords?: PaymentRecord[]
-}
-
-export interface Ingredient {
-  id: string
-  name: string
-  quantity: number
-  unit: string
-  minThreshold: number
-  lastUpdated: string
-}
-
-/**
- * Expense type is exported here so components can import the type-only symbol
- * from the centralized Dexie DB module.
- */
-export interface Expense {
-  id: string
-  item: string // e.g. "Flour - 25kg bag"
-  quantity: number // number of units (e.g. 1 bag)
-  unit: string // e.g. "bag"
-  unitWeight?: string // "25kg"
-  cost: number // total cost
-  supplier?: string
-  date: string
-  notes?: string
-}
-
-/* ---- Dexie DB ---- */
 class AppDB extends Dexie {
   orders!: Dexie.Table<Order, string>
   ingredients!: Dexie.Table<Ingredient, string>

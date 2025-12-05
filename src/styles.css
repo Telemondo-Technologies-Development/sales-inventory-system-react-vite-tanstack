@@ -21,57 +21,6 @@
 
 */
 
-:root {
-  --color-primary: #{$primary};
-  --color-secondary: #{$secondary};
-  --color-tertiary: #{$tertiary};
-  --color-error: #{$error};
-
-  /* container variants */
-  --primary-container: #{mix(#fff, $primary, 88%)}; /* lighten */
-  --secondary-container: #{mix(#fff, $secondary, 86%)};
-  --tertiary-container: #{mix(#fff, $tertiary, 82%)};
-  --error-container: #{mix(#fff, $error, 88%)};
-
-  /* on colors — pick white or black based on luminance (Sass doesn't have luminance in plain SCSS, but if using sass-color-functions plugin you can compute) */
-  /* For now set manually or compute with JS during runtime: */
-  --on-primary: #{if(lightness($primary) > 50%, #111, #fff)};
-  --on-secondary: #{if(lightness($secondary) > 50%, #111, #fff)};
-  --on-tertiary: #{if(lightness($tertiary) > 50%, #111, #fff)};
-  --on-error: #{if(lightness($error) > 50%, #111, #fff)};
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
-}
 
 .elevation-1 {
   @apply shadow-[0_1px_3px_rgba(0,0,0,0.12),_0_1px_2px_rgba(0,0,0,0.24)];

@@ -6,12 +6,12 @@ import {
 } from '@tanstack/react-router'
 
 import Index from './routes/index'
-import Profile from './routes/SalesView'
-import LoginPage from './routes/LoginPage'
+import Profile from './routes/sales-view'
+import LoginPage from './routes/login-page'
 
 
-import RootLayout from './routes/__root'
-import RootLogin from './routes/authlayout'
+import RootLayout from './routes/common/__root'
+import RootLogin from './routes/common/authlayout'
 
 
 

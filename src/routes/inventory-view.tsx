@@ -9,14 +9,8 @@ import {
 } from "../database/inventory-helper/InventoryDexieDB"
 import ExpenseModal from "../components/inventory-system/InventoryDetails"
 
-interface Ingredient {
-  id: string
-  name: string
-  quantity: number
-  unit: string
-  minThreshold: number
-  lastUpdated: string
-}
+import type { Ingredient } from "../database/inventory-helper/InventoryDexieDB"
+
 
 export default function InventoryView() {
   const [ingredients, setIngredients] = useState<Ingredient[]>([])

@@ -1,6 +1,19 @@
 import { db } from "../common/DexieDB"
-import type { Expense } from "../common/DexieDB"
+
 import { findMatchingIngredient, addIngredient, updateIngredient } from "../inventory-helper/InventoryDexieDB"
+
+
+export interface Expense {
+  id: string
+  item: string // e.g. "Flour - 25kg bag"
+  quantity: number // number of units (e.g. 1 bag)
+  unit: string // e.g. "bag"
+  unitWeight?: string // "25kg"
+  cost: number // total cost
+  supplier?: string
+  date: string
+  notes?: string
+}
 
 /**
  * addExpense:

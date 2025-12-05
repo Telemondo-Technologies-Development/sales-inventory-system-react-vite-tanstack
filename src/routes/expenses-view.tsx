@@ -4,9 +4,9 @@ import { Plus, Edit2, Trash2, Search } from "lucide-react"
 import { getExpenses, deleteExpense } from "../database/expenses-helper/ExpensesDexieDB"
 import { getIngredients } from "../database/inventory-helper/InventoryDexieDB"
 import ExpenseFormModal from "../components/expenses-system/ExpensesDetails"
-import type { Expense } from "../database/common/DexieDB"
+import type { Expense } from "../database/expenses-helper/ExpensesDexieDB"
 
-export default function ExpensesPage() {
+export default function ExpensesView() {
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [loading, setLoading] = useState(true)
   const [query, setQuery] = useState("")
