@@ -1,4 +1,3 @@
-"use client"
 
 import React, { useEffect, useMemo, useState } from "react"
 import { Plus, Edit2, Trash2, Search } from "lucide-react"
@@ -127,7 +126,7 @@ export default function ExpensesPage() {
         <div className="max-h-[70vh] overflow-auto">
           <table className="w-full text-sm min-w-[900px]">
             <thead>
-              <tr className="bg-gray-100 ">
+              <tr className="bg-gray-200 ">
                 <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Date</th>
                 <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Item</th>
                 <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Qty</th>

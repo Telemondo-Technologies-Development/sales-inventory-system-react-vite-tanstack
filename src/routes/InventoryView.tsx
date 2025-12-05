@@ -1,4 +1,4 @@
-"use client"
+
 
 import React, { useEffect, useState } from "react"
 import { AlertTriangle, Plus, Edit2, Save, X, Trash2 } from "lucide-react"
@@ -122,7 +122,7 @@ export default function InventoryView() {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className=" border-gray-100">
+              <tr className=" border-gray-200 bg-gray-200">
                 <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Ingredient</th>
                 <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Quantity</th>
                 <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Min Threshold</th>
@@ -191,7 +191,7 @@ export default function InventoryView() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        <div className="flex justify-center gap-2">
+                        <div className="flex justify-center gap-[70px]">
                           {editingId === ingredient.id ? (
                             <>
                               <button
@@ -216,14 +216,14 @@ export default function InventoryView() {
                                   setEditingId(ingredient.id)
                                   setEditForm(ingredient)
                                 }}
-                                className="p-2 bg-[#445e91] text-white rounded-lg hover:bg-[#3a4a78] shadow-sm transition"
+                                className="px-3 py-1 bg-white border rounded text-sm text-[#445e91] hover:shadow-sm"
                                 title="Edit"
                               >
                                 <Edit2 className="w-4 h-4" />
                               </button>
                               <button
                                 onClick={() => deleteIng(ingredient.id)}
-                                className="p-2 bg-red-50 text-red-700 rounded-lg hover:bg-red-100 shadow-sm transition"
+                                className="px-3 py-1 bg-white border rounded text-sm text-red-700 hover:shadow-sm"
                                 title="Delete"
                               >
                                 <Trash2 className="w-4 h-4" />
