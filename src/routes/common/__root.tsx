@@ -11,6 +11,7 @@ import {
   DollarSign,
   House
 } from "lucide-react"
+import LogoUrl from "/logo.webp"
 
 export default function RootLayout() {
   const navigate = useNavigate()
@@ -106,7 +107,7 @@ export default function RootLayout() {
           <button aria-label="Open menu" onClick={() => setMobileOpen(true)} className="p-2 rounded hover:bg-gray-100">
             <AlignStartVertical />
           </button>
-          <div className="font-bold text-lg">Dashboard</div>
+          <div className="font-bold text-lg">Serenity</div>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={handleLogout} className="flex items-center gap-2 text-[#ba1a1a] px-2 py-1 rounded hover:bg-red-50">
@@ -124,10 +125,10 @@ export default function RootLayout() {
         <div className="flex flex-col h-full w-full">
           <div className="px-3 py-4 flex items-center justify-start">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded bg-[#266489] flex items-center justify-center text-white font-bold">
-                <AlignStartVertical />
+              <div className="w-8 h-8 rounded flex items-center justify-center text-white font-bold">
+                <img src={LogoUrl}/>
               </div>
-              <span className="ml-8 font-bold text-lg truncate">Dashboard</span>
+              <span className="ml-8 font-bold text-lg truncate text-primary">Serenity</span>
             </div>
           </div>
 
@@ -161,7 +162,9 @@ export default function RootLayout() {
         <div className="absolute left-0 top-0 bottom-0 w-[250px] bg-white border-r border-gray-200 shadow-lg p-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded bg-[#445e91] flex items-center justify-center text-white font-bold">B</div>
+              <div className="w-8 h-8 rounded flex items-center justify-center text-white font-bold">
+                <img src={LogoUrl}/>
+              </div>
               <div className="font-bold">Dashboard</div>
             </div>
             <button onClick={() => setMobileOpen(false)} className="p-2 rounded hover:bg-gray-100">
@@ -169,8 +172,8 @@ export default function RootLayout() {
             </button>
           </div>
 
-          <nav className="flex flex-col gap-2">
-            <NavLink to="/index" Icon={UserRoundPen}>Home</NavLink>
+          <nav className="mt-4 px-2 flex flex-col gap-2 ">
+            <NavLink to="/index" Icon={House}>Home</NavLink>
             <NavLink to="/sales-view" Icon={UserRoundPen}>Sales</NavLink>
             <NavLink to="/table-orders" Icon={ListOrdered}>Table Orders</NavLink>
             <NavLink to="/order-view" Icon={View}>Order View</NavLink>

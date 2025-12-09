@@ -12,33 +12,8 @@ import {
 
 import OrderDetailsModal from "../components/order-system/OrderDetails"
 
-interface OrderItem {
-  id: string
-  name: string
-  price: number
-  quantity: number
-}
+import type { Order, PaymentRecord } from "../database/order-helper/OrderDexieDB"
 
-interface PaymentRecord {
-  id: string
-  method: "Cash" | "Card" | "Online"
-  amount: number
-  reference?: string
-  createdAt: string
-}
-
-interface Order {
-  id: string
-  tableNumber: string
-  items: OrderItem[]
-  notes: string
-  status: "pending" | "served" | "payment"
-  createdAt: string
-  subtotal: number
-  tax: number
-  total: number
-  paymentRecords?: PaymentRecord[]
-}
 
 /* ---------- OrdersView component (Dexie + optimistic UI + payments & edit items) ---------- */
 export default function OrdersView() {

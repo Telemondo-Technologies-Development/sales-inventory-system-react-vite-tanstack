@@ -1,82 +1,82 @@
+import React from "react"
 import {
   createRootRoute,
   createRoute,
   createRouter,
   RouterProvider,
-} from '@tanstack/react-router'
+} from "@tanstack/react-router"
 
-import Index from './routes/index'
-import Profile from './routes/sales-view'
-import LoginPage from './routes/login-page'
+import RootLayout from "./routes/common/__root"
+import RootLogin from "./routes/common/authlayout"
+import LoginPage from "./routes/login-page"
+import SalesView from "./routes/sales-view"
+import TabletOrderInterface from "./routes/table-order-view"
+import OrderView from "./routes/order-view"
+import InventoryView from "./routes/inventory-view"
+import ExpensesView from "./routes/expenses-view"
 
+/**
+ * App is a pure React component: no DOM access, no side-effects.
+ * Tests can safely render <App /> without causing document.getElementById(...) to run.
+ */
 
-import RootLayout from './routes/common/__root'
-import RootLogin from './routes/common/authlayout'
+const rootRoute = createRootRoute()
 
-
-
-import './styles.css'
-
-// ------------------------
-// Root Layout
-// ------------------------
-const rootRoute = createRootRoute({
+const appLayout = createRoute({
+  getParentRoute: () => rootRoute,
+  id: "app",
   component: RootLayout,
 })
 
-// ------------------------
-// Login Layout (nested)
-// ------------------------
-const loginLayoutRoute = createRoute({
+const loginLayout = createRoute({
   getParentRoute: () => rootRoute,
-  id: 'loginLayout',
+  id: "auth",
   component: RootLogin,
 })
 
-// ------------------------
-// Child Routes
-// ------------------------
 const loginRoute = createRoute({
-  getParentRoute: () => loginLayoutRoute,
-  path: '/',
+  getParentRoute: () => loginLayout,
+  path: "/",
   component: LoginPage,
 })
 
-const indexRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/index',
-  component: Index,
+const salesViewRoute = createRoute({
+  getParentRoute: () => appLayout,
+  path: "/sales-view",
+  component: SalesView,
 })
 
-const profileRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/profile',
-  component: Profile,
+const tabletOrderRoute = createRoute({
+  getParentRoute: () => appLayout,
+  path: "/table-orders",
+  component: TabletOrderInterface,
 })
 
-// ------------------------
-// Route Tree
-// ------------------------
+const orderViewRoute = createRoute({
+  getParentRoute: () => appLayout,
+  path: "/order-view",
+  component: OrderView,
+})
+
+const inventoryViewRoute = createRoute({
+  getParentRoute: () => appLayout,
+  path: "/inventory-view",
+  component: InventoryView,
+})
+
+const expensesViewRoute = createRoute({
+  getParentRoute: () => appLayout,
+  path: "/expenses-view",
+  component: ExpensesView,
+})
+
 const routeTree = rootRoute.addChildren([
-  loginLayoutRoute.addChildren([loginRoute]),
-  indexRoute,
-  profileRoute,
+  loginLayout.addChildren([loginRoute]),
+  appLayout.addChildren([salesViewRoute, tabletOrderRoute, orderViewRoute, inventoryViewRoute, expensesViewRoute]),
 ])
 
-// ------------------------
-// Router
-// ------------------------
-const router = createRouter({
-  routeTree,
-})
-
-import { TanStackRouterDevtoolsInProd } from '@tanstack/react-router-devtools'
+const router = createRouter({ routeTree })
 
 export default function App() {
-  return (
-    <>
-      <RouterProvider router={router} />
-      <TanStackRouterDevtoolsInProd />
-    </>
-  )
+  return <RouterProvider router={router} />
 }

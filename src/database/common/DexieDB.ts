@@ -2,12 +2,16 @@ import Dexie from "dexie"
 import type { Order } from "../order-helper/OrderDexieDB"
 import type { Ingredient } from "../inventory-helper/InventoryDexieDB"
 import type { Expense } from "../expenses-helper/ExpensesDexieDB"
+import type { MenuItem } from "@/database/menu-helper/MenuDexieDB"
 
-
+/**
+ * Central Dexie DB instance used across the app.
+ * Make sure MenuDBItem here matches the MenuDBItem type in the helper file.
+ */
 class AppDB extends Dexie {
   orders!: Dexie.Table<Order, string>
   ingredients!: Dexie.Table<Ingredient, string>
-  menuItems!: Dexie.Table<{ id: string; name: string; price: number; category: string; image?: string }, string>
+  menuItems!: Dexie.Table<MenuItem, string>
   expenses!: Dexie.Table<Expense, string>
 
   constructor() {

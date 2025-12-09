@@ -9,37 +9,11 @@ import {
   TopItemsPie,
 } from "../components/sales-system/SalesDetails"
 
-type OrderItem = {
-  id: string
-  name: string
-  price: number
-  quantity: number
-}
+import type { Order } from "../database/order-helper/OrderDexieDB"
+import type { Expense } from "../database/expenses-helper/ExpensesDexieDB" 
+ 
 
-type Order = {
-  id: string
-  tableNumber: string
-  items: OrderItem[]
-  notes: string
-  status: "pending" | "served" | "payment"
-  createdAt: string
-  subtotal: number
-  tax: number
-  total: number
-  paymentRecords?: Array<{ id: string; method: string; amount: number; createdAt: string }>
-}
 
-type Expense = {
-  id: string
-  item: string
-  quantity: number
-  unit: string
-  unitWeight?: string
-  cost: number
-  supplier?: string
-  date: string
-  notes?: string
-}
 
 export default function SalesView() {
   const [orders, setOrders] = useState<Order[]>([])
