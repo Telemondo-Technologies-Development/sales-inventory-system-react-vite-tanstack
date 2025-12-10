@@ -15,7 +15,6 @@ import OrderDetailsModal from "../components/order-system/OrderDetails"
 import type { Order, PaymentRecord } from "../database/order-helper/OrderDexieDB"
 
 
-/* ---------- OrdersView component (Dexie + optimistic UI + payments & edit items) ---------- */
 export default function OrdersView() {
   const [orders, setOrders] = useState<Order[]>([])
   // default to "pending" view; removed "all"
@@ -57,7 +56,7 @@ export default function OrdersView() {
 
     try {
       await dbDeleteOrder(orderId)
-      // DB changed; reload when needed
+
     } catch (err) {
       console.error("Failed to delete order:", err)
       setOrders(prev)
@@ -72,7 +71,7 @@ export default function OrdersView() {
 
     try {
       await dbUpdateOrder(edited)
-      // DB changed; reload when needed
+
     } catch (err) {
       console.error("Failed to save order edits:", err)
       setOrders(prev)
@@ -134,8 +133,9 @@ export default function OrdersView() {
 
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-[16px] bg-white rounded-xl p-4 shadow-md border border-gray-200">
-        <h1 className="text-3xl font-bold text-[#266489]">Order Management</h1>
+      <div className="flex flex-col items-start mb-[16px] bg-primary-foreground rounded-xl p-2 elevation-1 ">
+        <h1 className="text-3xl font-medium text-primary">Order Management</h1>
+        <p className="text-sm text-muted-foreground">Overview of orders and fulfillment</p>
       </div>
 
       {/* Navigation (semantic) - only Pending, Served, Payment */}
@@ -147,8 +147,8 @@ export default function OrdersView() {
                 onClick={() => setFilter(status)}
                 className={`px-4 py-2 rounded-lg font-semibold transition-all text-sm ${
                   filter === status
-                    ? "bg-[#266489] text-white shadow-sm"
-                    : "bg-white text-[#266489] elevation-1 hover:border-[#266489]"
+                    ? "bg-primary text-primary-foreground elevation-1"
+                    : "bg-primary-foreground text-primary elevation-1 hover:border-primary"
                 }`}
                 aria-pressed={filter === status}
               >
@@ -167,10 +167,10 @@ export default function OrdersView() {
         // Payment table view (compact)
         <section aria-labelledby="payments-heading">
           <h2 id="payments-heading" className="sr-only">Payment Orders</h2>
-          <div className="overflow-x-auto bg-white rounded-xl elevation-1 shadow-sm">
+          <div className="overflow-x-auto bg-primary-foreground rounded-2xl elevation-1 ">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-gray-100">
+                <tr className="bg-gray-200">
                   <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Order</th>
                   <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Table</th>
                   <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Total</th>
@@ -188,7 +188,7 @@ export default function OrdersView() {
                   const lastPayment = (o.paymentRecords || []).slice(-1)[0]
 
                   return (
-                    <tr key={o.id} className="border-t hover:bg-gray-50">
+                    <tr key={o.id} className="border-t border-gray-200 hover:bg-gray-50">
                       <td className="px-3 py-2">{o.id}</td>
                       <td className="px-3 py-2">{o.tableNumber}</td>
                       <td className="px-3 py-2">₱{o.total.toFixed(2)}</td>
@@ -218,7 +218,7 @@ export default function OrdersView() {
                           </button>
                           <button
                             onClick={() => deleteOrder(o.id)}
-                            className="px-2 py-1 bg-white border border-red-100 text-red-700 rounded text-sm hover:bg-red-50"
+                            className="px-2 py-1 bg-primary-foreground border border-red-100 text-error rounded text-sm hover:bg-red-50"
                             title="Delete"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -230,7 +230,7 @@ export default function OrdersView() {
                 })}
                 {filteredOrders.length === 0 && (
                   <tr>
-                    <td colSpan={8} className="px-3 py-6 text-center text-[#6b6b73]">
+                    <td colSpan={8} className="px-3 py-6 text-center text-muted-foreground">
                       No payment orders found
                     </td>
                   </tr>
@@ -243,20 +243,20 @@ export default function OrdersView() {
         // Grid view for pending/served
         <section aria-labelledby="orders-heading">
           <h2 id="orders-heading" className="sr-only">Orders</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {filteredOrders.map((order) => {
               const config = statusConfig[order.status]
               const StatusIcon = config.icon
               return (
                 <article
                   key={order.id}
-                  className={`flex flex-col h-full rounded-xl p-5 border border-[#e8e8ec] bg-white shadow-sm`}
+                  className={`flex flex-col h-full rounded-2xl p-5 border border-[#e8e8ec] bg-primary-foreground elevation-1`}
                 >
                   <header className="flex items-start justify-between gap-4 mb-4">
                     <div>
-                      <p className="text-xs text-[#50606e]">Order ID</p>
-                      <p className="font-bold text-lg text-[#266489]">{order.id}</p>
-                      <p className="text-sm text-[#50606e] mt-1">
+                      <p className="text-xs text-muted-foreground">Order ID</p>
+                      <p className="font-bold text-lg text-primary">{order.id}</p>
+                      <p className="text-sm text-muted-foreground mt-1">
                         Table: <span className="font-semibold">{order.tableNumber}</span>
                       </p>
                     </div>
@@ -275,23 +275,23 @@ export default function OrdersView() {
                           <span className="font-semibold">₱{(item.price * item.quantity).toFixed(2)}</span>
                         </div>
                       ))}
-                      {order.items.length > 3 && <div className="text-xs text-[#6b6b73] mt-2">+{order.items.length - 3} more item(s)</div>}
+                      {order.items.length > 3 && <div className="text-xs text-muted-foreground mt-2">+{order.items.length - 3} more item(s)</div>}
                     </div>
                   </section>
 
                   {/* totals block */}
                   <div className="mb-4">
-                    <div className="flex justify-between text-sm text-[#6b6b73]">
+                    <div className="flex justify-between text-sm text-muted-foreground">
                       <span>Subtotal</span>
                       <span>₱{order.subtotal.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-sm text-[#6b6b73]">
+                    <div className="flex justify-between text-sm text-muted-foreground">
                       <span>Tax</span>
                       <span>₱{order.tax.toFixed(2)}</span>
                     </div>
-                    <div className="flex justify-between text-lg font-bold pt-2 border-t border-[#f0f0f3] text-[#266489]">
+                    <div className="flex justify-between text-lg font-bold pt-2 border-t border-primary-foreground text-primary">
                       <span>Total</span>
-                      <span className="text-[#50606e]">₱{order.total.toFixed(2)}</span>
+                      <span className="text-muted-foreground">₱{order.total.toFixed(2)}</span>
                     </div>
                   </div>
 
@@ -301,7 +301,7 @@ export default function OrdersView() {
                       {order.status === "pending" && (
                         <button
                           onClick={() => updateOrderStatus(order.id, "served")}
-                          className="flex-1 py-2 bg-[#266489] text-white rounded-lg font-semibold hover:bg-[#50606e] transition text-sm"
+                          className="flex-1 py-2 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/80 transition text-sm"
                         >
                           Mark Served
                         </button>
@@ -309,7 +309,7 @@ export default function OrdersView() {
                       {order.status === "served" && (
                         <button
                           onClick={() => updateOrderStatus(order.id, "payment")}
-                          className="flex-1 py-2 bg-[#004b6f] text-white rounded-lg font-semibold hover:bg-[#384956] transition text-sm"
+                          className="flex-1 py-2 bg-secondary text-secondary-foreground rounded-lg font-semibold hover:bg-secondary/80 transition text-sm"
                         >
                           Request Payment
                         </button>
@@ -317,7 +317,7 @@ export default function OrdersView() {
 
                       <button
                         onClick={() => setSelectedOrder(order)}
-                        className="py-2 px-3 bg-white border border-[#e6e6e9] rounded-lg text-[#5d4037] hover:shadow-sm transition text-sm"
+                        className="py-2 px-3 bg-primary-foreground border border-primary-foreground rounded-lg text-primary hover:shadow-sm transition text-sm"
                       >
                         See Details
                       </button>
@@ -325,7 +325,7 @@ export default function OrdersView() {
 
                     <button
                       onClick={() => deleteOrder(order.id)}
-                      className="py-2 px-3 bg-white border border-red-100 text-red-700 rounded-lg hover:bg-red-50 transition text-sm"
+                      className="py-2 px-3 bg-primary-foreground border border-red-100 text-error rounded-2xl hover:bg-red-50 transition text-sm"
                       title="Delete order"
                     >
                       <Trash2 className="w-4 h-4" />

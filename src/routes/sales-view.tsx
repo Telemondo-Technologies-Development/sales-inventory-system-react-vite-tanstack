@@ -89,62 +89,62 @@ export default function SalesView() {
 
   return (
     <div className="p-6 space-y-6">
-      <header className="flex justify-between items-center mb-[16px] bg-[#ffffff] rounded-xl p-4 shadow-sm elevation-1 ">
-        <h1 className="text-2xl font-bold text-[#266489]">Dashboard</h1>
-        <div className="text-sm text-[#72787e]">Overview of sales, revenue and expenses</div>
+      <header className="flex flex-col justify-between items-start bg-primary-foreground rounded-xl p-2 elevation-1 ">
+        <h1 className="text-2xl font-medium text-primary">Dashboard</h1>
+        <p className="text-sm text-muted-foreground">Overview of sales, revenue and expenses</p>
       </header>
 
       {/* KPI cards */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 ">
-        <div className="bg-white rounded-lg p-4 elevation-1">
-          <div className="text-sm text-[#72787e]">Total Revenue</div>
-          <div className="text-2xl font-semibold text-[#41474d]">₱{totalRevenue.toFixed(2)}</div>
-          <div className="text-xs text-gray-400 mt-2">Period: all-time</div>
+        <div className="bg-primary-foreground rounded-lg p-4 elevation-1">
+          <div className="text-sm text-muted-foreground">Total Revenue</div>
+          <div className="text-2xl font-semibold text-primary">₱{totalRevenue.toFixed(2)}</div>
+          <div className="text-xs text-muted-foreground mt-2">Period: all-time</div>
         </div>
 
-        <div className="bg-white rounded-lg p-4 elevation-1">
-          <div className="text-sm text-[#72787e]">Total Orders</div>
-          <div className="text-2xl font-semibold text-[#41474d]">{totalOrders}</div>
-          <div className="text-xs text-[#72787e] mt-2">Avg: ₱{avgOrderValue.toFixed(2)} / order</div>
+        <div className="bg-primary-foreground rounded-lg p-4 elevation-1">
+          <div className="text-sm text-muted-foreground">Total Orders</div>
+          <div className="text-2xl font-semibold text-primary">{totalOrders}</div>
+          <div className="text-xs text-muted-foreground mt-2">Avg: ₱{avgOrderValue.toFixed(2)} / order</div>
         </div>
 
-        <div className="bg-white rounded-lg p-4 elevation-1">
-          <div className="text-sm text-[#72787e]">Total Expenses</div>
-          <div className="text-2xl font-semibold text-[#266489]">₱{totalExpenses.toFixed(2)}</div>
-          <div className="text-xs text-[#72787e] mt-2">Includes recorded purchases</div>
+        <div className="bg-primary-foreground rounded-lg p-4 elevation-1">
+          <div className="text-sm text-muted-foreground">Total Expenses</div>
+          <div className="text-2xl font-semibold text-primary">₱{totalExpenses.toFixed(2)}</div>
+          <div className="text-xs text-muted-foreground mt-2">Includes recorded purchases</div>
         </div>
 
-        <div className="bg-white rounded-lg p-4 elevation-1">
-          <div className="text-sm text-[#72787e]">Estimated Profit</div>
-          <div className="text-2xl font-semibold text-[#41474d]">{profit >= 0 ? "₱" + profit.toFixed(2) : "- ₱" + Math.abs(profit).toFixed(2)}</div>
-          <div className="text-xs text-[#72787e] mt-2">Revenue − Expenses</div>
+        <div className="bg-primary-foreground rounded-lg p-4 elevation-1">
+          <div className="text-sm text-muted-foreground">Estimated Profit</div>
+          <div className="text-2xl font-semibold text-primary">{profit >= 0 ? "₱" + profit.toFixed(2) : "- ₱" + Math.abs(profit).toFixed(2)}</div>
+          <div className="text-xs text-muted-foreground mt-2">Revenue − Expenses</div>
         </div>
       </section>
 
       {/* Charts area */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg p-4 elevation-1">
-          <h3 className="text-lg font-semibold mb-2 text-[#41474d]">Revenue (by day)</h3>
+        <div className="bg-primary-foreground rounded-lg p-4 elevation-1">
+          <h3 className="text-lg font-semibold mb-2 text-muted-foreground">Revenue (by day)</h3>
           {revenueByDay.length === 0 ? (
-            <div className="py-12 text-center text-gray-500">No revenue data yet</div>
+            <div className="py-12 text-center text-muted-foreground">No revenue data yet</div>
           ) : (
             <RevenueLineChart data={revenueByDay} />
           )}
         </div>
 
-        <div className="bg-white rounded-lg p-4 elevation-1">
-          <h3 className="text-lg font-semibold mb-2 text-[#41474d]">Orders (by day)</h3>
+        <div className="bg-primary-foreground rounded-lg p-4 elevation-1">
+          <h3 className="text-lg font-semibold mb-2 text-muted-foreground">Orders (by day)</h3>
           {ordersByDay.length === 0 ? (
-            <div className="py-12 text-center text-gray-500">No orders yet</div>
+            <div className="py-12 text-center text-muted-foreground">No orders yet</div>
           ) : (
             <SalesBarChart data={ordersByDay} />
           )}
         </div>
 
-        <div className="bg-white rounded-lg p-4 elevation-1 lg:col-span-2">
-          <h3 className="text-lg font-semibold mb-2 text-[#41474d]">Top Sold Items</h3>
+        <div className="bg-primary-foreground rounded-lg p-4 elevation-1 lg:col-span-2">
+          <h3 className="text-lg font-semibold mb-2 text-muted-foreground">Top Sold Items</h3>
           {topItems.length === 0 ? (
-            <div className="py-12 text-center text-gray-500">No items sold yet</div>
+            <div className="py-12 text-center text-muted-foreground">No items sold yet</div>
           ) : (
             <TopItemsPie data={topItems.slice(0, 8)} />
           )}
@@ -153,7 +153,7 @@ export default function SalesView() {
 
       {/* small notes */}
       <section>
-        <div className="text-sm text-[#72787e]">
+        <div className="text-sm text-muted-foreground">
           Notes: Revenue is derived from order.total. Expenses are taken from recorded purchases. Profit shown is a simple Revenue − Expenses snapshot; if you want per-order cost-of-goods or inventory-consumption-based margins we can compute that next by mapping expense items to used quantities.
         </div>
       </section>

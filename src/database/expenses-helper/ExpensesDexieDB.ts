@@ -5,11 +5,11 @@ import { findMatchingIngredient, addIngredient, updateIngredient } from "../inve
 
 export interface Expense {
   id: string
-  item: string // e.g. "Flour - 25kg bag"
-  quantity: number // number of units (e.g. 1 bag)
-  unit: string // e.g. "bag"
-  unitWeight?: string // "25kg"
-  cost: number // total cost
+  item: string
+  quantity: number 
+  unit: string 
+  unitWeight?: string 
+  cost: number 
   supplier?: string
   date: string
   notes?: string

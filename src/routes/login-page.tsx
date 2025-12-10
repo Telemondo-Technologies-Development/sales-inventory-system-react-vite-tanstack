@@ -1,103 +1,121 @@
-
 import type React from "react"
 import { useState } from "react"
 import { useRouter } from "@tanstack/react-router"
 import { AlertCircle } from "lucide-react"
+import { findEmployeeByUsernameOrEmail } from "@/database/employee-helper/EmployeeDexieDB"
+
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("")
+  const [emailOrUsername, setEmailOrUsername] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState("")
-  const [role, setRole] = useState<"admin" | "employee">("employee")
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  const mockUsers = [
-    { email: "admin@restaurant.com", password: "admin123", role: "admin", name: "Admin" },
-    { email: "employee@restaurant.com", password: "emp123", role: "employee", name: "John Doe" },
-  ]
+  const routeForRole = (role: string) => {
+    if (role === "admin") return "/sales-view"
+    if (role === "manager") return "/order-view"
+    return "/employees"
+  }
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
+    if (!emailOrUsername.trim() || !password) {
+      setError("Please enter username/email and password.")
+      return
+    }
 
-    const user = mockUsers.find((u) => u.email === email && u.password === password && u.role === role)
+    setLoading(true)
+    try {
+      const found = await findEmployeeByUsernameOrEmail(emailOrUsername.trim())
+      if (!found) {
+        setError("No account found for that username/email. Ask an admin to register you.")
+        return
+      }
 
-    if (user) {
-      localStorage.setItem("currentUser", JSON.stringify(user))
-      router.navigate({ to: role === "admin" ? "/sales-view" : "/orders" })
-    } else {
-      setError("Invalid credentials. Try admin@restaurant.com / admin123 or employee@restaurant.com / emp123")
+      if (!found.password) {
+        setError("This account does not have a password set. Ask an admin to set credentials.")
+        return
+      }
+
+      if (found.password !== password) {
+        setError("Invalid credentials.")
+        return
+      }
+
+ 
+      const publicUser = {
+        id: found.id,
+        username: found.username ?? found.email ?? found.id,
+        name: found.name,
+        role: found.role,
+      }
+      try {
+        localStorage.setItem("currentUser", JSON.stringify(publicUser))
+      } catch {
+
+      }
+
+      router.navigate({ to: routeForRole(found.role) })
+    } catch (err) {
+      console.error("Login lookup failed", err)
+      setError("An unexpected error occurred. Try again.")
+    } finally {
+      setLoading(false)
     }
   }
 
   return (
-    <section className="min-h-screen from-primary via-background to-accent flex items-center justify-center ">
-      <div className="w-full max-w-md elevation-3 bg-[#f9f9ff] rounded-2xl p-8 ">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-[#266489] mb-2">Restaurant</h1>
-          <h2 className="text-lg font-semibold text-[#50606e]">Management System</h2>
+    <section className="min-h-screen flex items-center justify-center">
+      <div className="w-full max-w-md bg-primary-foreground rounded-2xl p-8 elevation-3">
+        <div className="mb-6">
+          <h1 className="text-3xl font-medium text-primary">Serenity Restaurant Management</h1>
+          <p className="text-sm text-foreground font-light">Management System — sign in with your registered account</p>
         </div>
 
-        <form onSubmit={handleLogin} className="space-y-6 ">
+        <form onSubmit={handleLogin} className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-card-foreground mb-2">Role</label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value as "admin" | "employee")}
-              className="w-full px-4 py-3 bg-[#ffffff] border border-border rounded-lg text-card-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
-            >
-              <option value="employee">Employee (Tablet)</option>
-              <option value="admin">Admin (Orders & Inventory)</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-card-foreground mb-2">Email</label>
+            <label className="block text-sm font-medium text-card-foreground mb-1">Username or Email</label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email"
-              className="w-full px-4 py-3 bg-input border border-border rounded-lg text-card-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+              autoComplete="username"
+              value={emailOrUsername}
+              onChange={(e) => setEmailOrUsername(e.target.value)}
+              placeholder="Enter username or email"
+              className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-card-foreground mb-2">Password</label>
+            <label className="block text-sm font-medium text-card-foreground mb-1">Password</label>
             <input
+              autoComplete="current-password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
-              className="w-full px-4 py-3 bg-input border border-border rounded-lg text-card-foreground placeholder-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+              className="w-full px-4 py-3 bg-input border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             />
           </div>
 
           {error && (
-            <div className="flex items-start gap-3 p-4 bg-[#ffdad6] border border-[#583e5b] rounded-lg">
-              <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-destructive">{error}</p>
+            <div className="flex items-start gap-3 p-3 bg-tertiary border border-tertiary rounded-2xl">
+              <AlertCircle className="w-5 h-5 text-primary-foreground" />
+              <p className="text-sm text-primary-foreground">{error}</p>
             </div>
           )}
 
           <button
             type="submit"
-            className="w-full py-3 bg-[#266489] text-[#ffffff] font-semibold rounded-lg hover:bg-[#50606e] transition-all elevation-1 active:elevation-2"
+            disabled={loading}
+            className="w-full py-3 bg-primary text-primary-foreground font-semibold rounded-2xl hover:bg-primary/80 transition-all "
           >
-            Sign In
+            {loading ? "Signing in…" : "Sign In"}
           </button>
         </form>
 
-        <div className="mt-8 pt-6 border-t border-border">
-          <p className="text-xs text-muted-foreground text-center mb-3">Demo Credentials:</p>
-          <div className="space-y-2">
-            <p className="text-xs text-muted-foreground">
-              <span className="font-semibold text-card-foreground">Admin:</span> admin@restaurant.com / admin123
-            </p>
-            <p className="text-xs text-muted-foreground">
-              <span className="font-semibold text-card-foreground">Employee:</span> employee@restaurant.com / emp123
-            </p>
-          </div>
+        <div className="mt-6 text-xs text-muted-foreground">
+          <p>If you don't have an account yet, ask an admin to register you.</p>
         </div>
       </div>
     </section>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { X } from "lucide-react"
-import { addExpense } from "../../database/expenses-helper/ExpensesDexieDB"
-import type { Expense } from "../../database/common/DexieDB"
+import { addExpense, type Expense } from "../../database/expenses-helper/ExpensesDexieDB"
+
 
 type Props = {
   open: boolean

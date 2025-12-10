@@ -78,25 +78,31 @@ export default function ExpensesView() {
 
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-[16px] bg-[#ffffff] rounded-xl p-4 shadow-sm elevation-1 ">
+      <div className="flex justify-between items-center mb-[16px] bg-primary-foreground rounded-xl p-2 shadow-sm elevation-1 ">
+
+        <div>
+          <h1 className="text-2xl font-medium text-primary">Expenses Management</h1>
+        <p className="text-sm text-foreground">Overview of costs and expenditures</p>
+        </div>
         
-        <h1 className="text-2xl font-bold text-[#266489]">Expenses</h1>
+        
+
 
         <div className="flex items-center gap-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <input
               placeholder="Search item, supplier, notes..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="pl-10 pr-3 py-2 elevation-1 rounded-2xl w-80 focus:ring-2 focus:ring-[#8f4c37]/30"
+              className="pl-10 pr-3 py-2 elevation-1 rounded-2xl w-80 focus:ring-2 focus:ring-primary/30 text-on-primary-container bg-primary-foreground"
             />
           </div>
 
           <select
             value={supplierFilter}
             onChange={(e) => setSupplierFilter(e.target.value)}
-            className="px-3 py-2 elevation-2 rounded-2xl bg-white"
+            className="px-3 py-2 elevation-1 rounded-2xl bg-primary-foreground text-on-primary-container focus:ring-2 focus:ring-primary/30"
           >
             <option value="">All suppliers</option>
             {suppliers.map((s) => (
@@ -106,27 +112,27 @@ export default function ExpensesView() {
             ))}
           </select>
 
-          <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="px-3 py-2 elevation-1 rounded-2xl" />
-          <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="px-3 py-2 elevation-1 rounded-2xl" />
+          <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="px-3 py-2 elevation-1 rounded-2xl text-on-primary-container bg-primary-foreground" />
+          <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="px-3 py-2 elevation-1 rounded-2xl text-on-primary-container bg-primary-foreground" />
 
           <button
             onClick={() => {
               setEditing(null)
               setShowModal(true)
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-[#266489] text-white rounded-2xl hover:bg-[#50606e] transition"
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-2xl hover:bg-secondary transition"
           >
             <Plus className="w-4 h-4" /> New Expense
           </button>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow  overflow-hidden">
+      <div className="bg-primary-foreground rounded-2xl elevation-1 overflow-hidden">
         {/* table wrapper gives a viewport with scroll; header will be sticky */}
         <div className="max-h-[70vh] overflow-auto">
           <table className="w-full text-sm min-w-[900px]">
             <thead>
-              <tr className="bg-gray-200 ">
+              <tr className="bg-gray-200">
                 <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Date</th>
                 <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Item</th>
                 <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Qty</th>
@@ -168,7 +174,7 @@ export default function ExpensesView() {
                             setEditing(e)
                             setShowModal(true)
                           }}
-                          className="px-3 py-1 bg-white border rounded text-sm text-[#445e91] hover:shadow-sm"
+                          className="px-3 py-1 bg-primary-foreground border rounded text-sm text-secondary hover:shadow-sm"
                           title="Edit"
                         >
                           <Edit2 className="w-4 h-4" />

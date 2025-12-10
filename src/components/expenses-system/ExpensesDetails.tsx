@@ -255,7 +255,7 @@ export default function ExpensesDetails({ open, initial = null, onClose, onSaved
                   <Button type="button" variant="ghost" onClick={onClose} className="py-2 px-4">
                     Cancel
                   </Button>
-                  <Button type="submit" className="py-2 px-4 cursor-pointer" disabled={saving || !form.formState.isValid}>
+                  <Button type="submit" className="py-2 px-4 cursor-pointer" variant="primary" disabled={saving || !form.formState.isValid}>
                     {saving ? "Saving…" : initial ? "Save Changes" : "Save Expense"}
                   </Button>
                 </div>

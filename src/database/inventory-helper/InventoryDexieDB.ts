@@ -1,7 +1,6 @@
 import { db, normalizeName } from "../common/DexieDB"
 
 
-
 export interface Ingredient {
   id: string
   name: string
@@ -12,7 +11,6 @@ export interface Ingredient {
 }
 
 
-
 export const getIngredients = async (): Promise<Ingredient[]> => db.ingredients.orderBy("name").toArray()
 export const addIngredient = async (ingredient: Ingredient) => db.ingredients.add(ingredient)
 export const updateIngredient = async (id: string, patch: Partial<Ingredient>) => {
@@ -21,9 +19,6 @@ export const updateIngredient = async (id: string, patch: Partial<Ingredient>) =
 }
 export const deleteIngredient = async (id: string) => db.ingredients.delete(id)
 
-/**
- * Simple matching helper (same logic as before)
- */
 export const findMatchingIngredient = async (itemName: string): Promise<Ingredient | undefined> => {
   const norm = normalizeName(itemName)
   const all = await db.ingredients.toArray()

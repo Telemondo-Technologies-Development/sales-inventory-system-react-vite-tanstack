@@ -188,19 +188,19 @@ export default function UpdateMenuModal({
     const id = item.id
     if (editingId === id && editForm?.image !== undefined) {
       // if editForm.image is explicitly null => show "removed"
-      if (editForm.image === null) return <div className="text-sm text-muted-foreground">Removed</div>
+      if (editForm.image === null) return <div className="text-sm text-foreground">Removed</div>
       // if blob preview exists
       if (previewUrls.current[id]) {
-        return <img src={previewUrls.current[id]} alt={item.name} className="w-24 h-16 object-cover rounded" />
+        return <img src={previewUrls.current[id]} alt={item.name} className="w-24 h-16 object-cover rounded-2xl" />
       }
       // if editForm.image is a Blob but no preview (unlikely) -> create one temporarily
       if (editForm.image instanceof Blob) {
         try {
           const tmp = URL.createObjectURL(editForm.image)
           previewUrls.current[id] = tmp
-          return <img src={tmp} alt={item.name} className="w-24 h-16 object-cover rounded" />
+          return <img src={tmp} alt={item.name} className="w-24 h-16 object-cover rounded-2xl" />
         } catch {
-          return <div className="text-sm text-muted-foreground">No preview</div>
+          return <div className="text-sm text-foreground">No preview</div>
         }
       }
       // fallthrough to show existing DB image if any
@@ -217,7 +217,7 @@ export default function UpdateMenuModal({
       if (url) return <img src={url} alt={item.name} className="w-24 h-16 object-cover rounded" />
     }
 
-    return <div className="text-sm text-muted-foreground">No image</div>
+    return <div className="text-sm text-3xl text-foreground">No image</div>
   }
 
   if (!open) return null
@@ -226,7 +226,7 @@ export default function UpdateMenuModal({
     <div className="fixed inset-0 z-60 flex items-start justify-center pt-12 px-4">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
-      <div className="relative z-10 w-full max-w-5xl bg-white rounded-lg shadow-lg overflow-hidden">
+      <div className="relative z-10 w-full max-w-5xl bg-primary-foreground rounded-2xl shadow-lg overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 border-b">
           <h3 className="text-lg font-semibold">Update Menu</h3>
           <div className="flex items-center gap-2">
@@ -239,10 +239,10 @@ export default function UpdateMenuModal({
         <div className="p-4">
           {error && <div className="mb-3 text-sm text-red-600">{error}</div>}
 
-          <div className="overflow-x-auto">
-            <table className="w-full">
+          <div className="overflow-x-auto rounded-2xl elevation-1">
+            <table className="w-full ">
               <thead>
-                <tr className=" border-gray-200 bg-gray-100">
+                <tr className="  bg-gray-200">
                   <th className="sticky top-0 z-20 px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b">Image</th>
                   <th className="sticky top-0 z-20 px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b">Name</th>
                   <th className="sticky top-0 z-20 px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b">Price</th>
@@ -254,11 +254,11 @@ export default function UpdateMenuModal({
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-[#6b6b73]">Loading…</td>
+                    <td colSpan={5} className="px-6 py-8 text-center text-foreground">Loading…</td>
                   </tr>
                 ) : items.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-8 text-center text-[#6b6b73]">No menu items</td>
+                    <td colSpan={5} className="px-6 py-8 text-center text-foreground">No menu items</td>
                   </tr>
                 ) : (
                   items.map((item) => {
@@ -278,11 +278,11 @@ export default function UpdateMenuModal({
                                   accept="image/*"
                                   onChange={(e) => handleFileChange(e, item.id)}
                                 />
-                                <div className="mt-2 text-xs text-muted-foreground">Replace image</div>
+                                <div className="mt-2 text-xs text-foreground">Replace image</div>
                                 <div className="mt-1">
                                   <button
                                     type="button"
-                                    className="px-2 py-1 text-xs text-red-600 rounded hover:bg-red-50"
+                                    className="px-2 py-1 text-xs text-error rounded-2xl hover:bg-red-50"
                                     onClick={() => {
                                       // mark as removed
                                       if (previewUrls.current[item.id]) {
@@ -308,10 +308,10 @@ export default function UpdateMenuModal({
                               type="text"
                               value={String(editForm?.name ?? item.name)}
                               onChange={(e) => setEditForm((p) => ({ ...(p ?? {}), name: e.target.value }))}
-                              className="px-2 py-1 bg-gray-50 border border-gray-200 rounded w-full text-sm"
+                              className="px-2 py-1 bg-gray-50 border border-gray-200 rounded-2xl w-full text-sm"
                             />
                           ) : (
-                            <div className="text-gray-700">{item.name}</div>
+                            <div className="text-foreground">{item.name}</div>
                           )}
                         </td>
 
@@ -327,7 +327,7 @@ export default function UpdateMenuModal({
                               className="px-2 py-1 bg-gray-50 border border-gray-200 rounded w-24 text-sm"
                             />
                           ) : (
-                            <div className="text-gray-700">₱{item.price.toFixed(2)}</div>
+                            <div className="text-foreground">₱{item.price.toFixed(2)}</div>
                           )}
                         </td>
 
@@ -344,7 +344,7 @@ export default function UpdateMenuModal({
                               <option>Desserts</option>
                             </select>
                           ) : (
-                            <div className="text-gray-700">{item.category}</div>
+                            <div className="text-foreground">{item.category}</div>
                           )}
                         </td>
 
@@ -354,7 +354,7 @@ export default function UpdateMenuModal({
                               <>
                                 <button
                                   onClick={() => handleSave(item.id)}
-                                  className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700 shadow-sm transition"
+                                  className="p-2 bg-tertiary text-white rounded-lg hover:bg-tertiary-dark shadow-sm transition"
                                   title="Save"
                                   disabled={savingId === item.id}
                                 >
@@ -373,14 +373,14 @@ export default function UpdateMenuModal({
                               <>
                                 <button
                                   onClick={() => startEdit(item)}
-                                  className="px-3 py-1 bg-white border rounded text-sm text-[#445e91] hover:shadow-sm"
+                                  className="px-3 py-1 bg-primary-foreground border rounded text-sm text-primary hover:shadow-sm"
                                   title="Edit"
                                 >
                                   <Edit2 className="w-4 h-4" />
                                 </button>
                                 <button
                                   onClick={() => handleDelete(item.id)}
-                                  className="px-3 py-1 bg-white border rounded text-sm text-red-700 hover:shadow-sm"
+                                  className="px-3 py-1 bg-primary-foreground border rounded text-sm text-error hover:shadow-sm"
                                   title="Delete"
                                   disabled={deletingId === item.id}
                                 >

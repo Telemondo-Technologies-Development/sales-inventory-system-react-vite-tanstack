@@ -1,73 +1,198 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
+@custom-variant dark (&:is(.dark *));
 
+/* ---------------------------
+   Color tokens (Light / Dark)
+   Replaced OKLCH values with the hex-based palette from your images.
+   --------------------------- */
+
+/* Light theme tokens */
 :root {
-  --radius: 0.5rem;
+  /* Surfaces & text */
+  --background: #f6f7f9;            /* surface / page background (light) */
+  --foreground: #263238;            /* main text on light */
+  --card: #ffffff;                  /* card background */
+  --card-foreground: #263238;       /* card text */
 
-  /* primary tokens */
-  --primary-rgb: 38 100 137; /* space-separated R G B (used by rgb(var(--primary-rgb))) */
-  --primary-hex: #266489;
-  --primary-foreground: #ffffff;
+  /* Primary / Secondary / Tertiary */
+  --primary: #266489;               /* deep teal / primary */
+  --primary-foreground: #ffffff;    /* text on primary */
+  --primary-container: #cfe9fb;     /* light container for primary */
+  --on-primary-container: #053249;
 
-  /* secondary / tertiary / error examples */
-  --secondary-rgb: 79 96 110;
-  --secondary-hex: #4f606e;
-  --tertiary-rgb: 100 89 124;
-  --error-rgb: 186 26 26;
+  --secondary: #50606e;             /* muted blue-gray */
+  --secondary-foreground: #ffffff;
 
-  /* surface */
-  --surface: #f6f8fa;
-  --surface-dim: #dfe3e6;
-  --on-surface: #111314;
+  --tertiary: #6b5876;              /* muted purple */
+  --tertiary-foreground: #ffffff;
 
-  /* utilities */
-  --scrim: rgba(0,0,0,0.85);
-  --shadow: rgba(0,0,0,0.65);
+  /* Error */
+  --error: #b71c1c;
+  --error-foreground: #ffffff;
+  --error-container: #ffd8d6;
+  --on-error-container: #7a0000;
+
+  /* Surface scale */
+  --surface: #f6f7f9;
+  --surface-dim: #e6eaed;
+  --surface-bright: #ffffff;
+  --on-surface: #263238;
+
+  /* Inverse */
+  --inverse-surface: #2f3437;
+  --inverse-on-surface: #e6eef6;
+  --inverse-primary: #aee6ff;
+
+  /* Misc / UI tokens */
+  --muted: #f0f2f4;
+  --muted-foreground: #6b6b73;
+  --border: #e9ecef;
+  --input: #f8f9fb;
+  --ring: #266489;
+  --shadow-color: rgba(3, 6, 23, 0.08);
+
+  /* sidebar tokens */
+  --sidebar: #f3f5f6;
+  --sidebar-foreground: #263238;
+  --sidebar-primary: #266489;
+  --sidebar-primary-foreground: #ffffff;
+
+  --radius: 0.75rem;
 }
 
-/* Import fonts & base */
+/* Dark theme overrides */
+.dark, [data-theme="dark"] {
+  --background: #121316;            /* dark page background */
+  --foreground: #e6eef6;            /* main text on dark */
+  --card: #1d2326;                  /* card background dark */
+  --card-foreground: #e6eef6;
+
+  --primary: #8fd4ff;               /* light blue primary for dark mode */
+  --primary-foreground: #0b2a34;    /* dark text on primary (if needed) */
+  --primary-container: #053249;
+  --on-primary-container: #cfe9fb;
+
+  --secondary: #9ebac9;
+  --secondary-foreground: #0d2230;
+
+  --tertiary: #d8c8ea;
+  --tertiary-foreground: #2b2330;
+
+  --error: #ffb4ab;
+  --error-foreground: #5e0000;
+  --error-container: #7a0000;
+  --on-error-container: #ffd8d6;
+
+  --surface: #121316;
+  --surface-dim: #0e0f10;
+  --surface-bright: #161719;
+  --on-surface: #e6eef6;
+
+  --inverse-surface: #e6eef6;
+  --inverse-on-surface: #1f2326;
+  --inverse-primary: #266489;
+
+  --muted: #0f1112;
+  --muted-foreground: #9aa4ac;
+  --border: #222528;
+  --input: #0f1112;
+  --ring: #8fd4ff;
+
+  --sidebar: #151718;
+  --sidebar-foreground: #e6eef6;
+  --sidebar-primary: #8fd4ff;
+  --sidebar-primary-foreground: #0b2a34;
+  --sidebar-border: #222528;
+
+  --radius: 0.75rem;
+}
+
+/* Map tokens into the theme variables used by components / utilities */
+@theme inline {
+  --font-sans: "Montserrat", "Geist", "Geist Fallback";
+  --font-mono: "Geist Mono", "Geist Mono Fallback";
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--card);
+  --color-popover-foreground: var(--card-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-tertiary: var(--tertiary);
+  --color-tertiary-foreground: var(--tertiary-foreground);
+
+  --color-error: var(--error);
+  --color-error-foreground: var(--error-foreground);
+
+  --color-surface: var(--surface);
+  --color-surface-dim: var(--surface-dim);
+  --color-on-surface: var(--on-surface);
+
+  --color-inverse-surface: var(--inverse-surface);
+  --color-inverse-on-surface: var(--inverse-on-surface);
+  --color-inverse-primary: var(--inverse-primary);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+/* Small helper classes that some components rely on */
+.bg-primary { background-color: var(--color-primary); }
+.text-on-primary { color: var(--color-primary-foreground); }
+.bg-surface { background-color: var(--color-surface); }
+.text-on-surface { color: var(--color-on-surface); }
+
+/* Tailwind base + body application */
 @layer base {
-  html {
-    font-family: 'Montserrat', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  * {
+    box-sizing: border-box;
   }
-  button:not(:disabled),
-  [role="button"]:not(:disabled) {
-    cursor: pointer;
+
+  html, body, #root {
+    height: 100%;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+  }
+
+  /* default border / outline token fallbacks used by some components */
+  :root {
+    --shadcn-border: var(--color-border);
+    --shadcn-ring: var(--color-ring);
   }
 }
 
-/* Elevation helpers */
+/* Material Design 3 elevation styles (kept from your original file) */
 .elevation-1 {
-  @apply shadow-[0_1px_3px_rgba(0,0,0,0.12),_0_1px_2px_rgba(0,0,0,0.24)];
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 }
 .elevation-2 {
-  @apply shadow-[0_3px_6px_rgba(0,0,0,0.16),_0_3px_6px_rgba(0,0,0,0.23)];
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
 }
 .elevation-3 {
-  @apply shadow-[0_10px_20px_rgba(0,0,0,0.19),_0_6px_6px_rgba(0,0,0,0.23)];
+  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 }
 
-/* Elevation utilities (kept as Tailwind @apply helpers) */
-.elevation-1 {
-  @apply shadow-[0_1px_3px_rgba(0,0,0,0.12),_0_1px_2px_rgba(0,0,0,0.24)];
-}
-.elevation-2 {
-  @apply shadow-[0_3px_6px_rgba(0,0,0,0.16),_0_3px_6px_rgba(0,0,0,0.23)];
-}
-.elevation-3 {
-  @apply shadow-[0_10px_20px_rgba(0,0,0,0.19),_0_6px_6px_rgba(0,0,0,0.23)];
-}
-
-/* Centralized design tokens (light scheme). 
-   These variables are intended to be referenced by tailwind.config.js
-   (e.g., "primary": "rgb(var(--primary-rgb) / <alpha-value>)") so you can use
-   bg-primary, text-primary/80, etc.
-*/
-
-/* Small helper classes for common things (optional) */
-.bg-fore {
-  background-color: var(--surface);
-}
-.text-on-surface {
-  color: var(--on-surface);
-}
+/* small utilities */
+.rounded-md { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }
+.shadow-soft { box-shadow: 0 4px 12px rgba(3,6,23,0.08); }

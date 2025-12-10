@@ -14,6 +14,7 @@ import TabletOrderInterface from "./routes/table-order-view"
 import OrderView from "./routes/order-view"
 import InventoryView from "./routes/inventory-view"
 import ExpensesView from "./routes/expenses-view"
+import EmployeeView from "./routes/employee-view"
 
 /**
  * App is a pure React component: no DOM access, no side-effects.
@@ -27,6 +28,7 @@ const appLayout = createRoute({
   id: "app",
   component: RootLayout,
 })
+
 
 const loginLayout = createRoute({
   getParentRoute: () => rootRoute,
@@ -70,9 +72,30 @@ const expensesViewRoute = createRoute({
   component: ExpensesView,
 })
 
+const employeeViewRoute = createRoute({
+  getParentRoute: () => appLayout,
+  path: "/employee-view",
+  component: EmployeeView,
+})
+
+// EXPOSE employee route at /employees (match LoginPage redirect)
+const EmployeeViewOnly = createRoute({
+  getParentRoute: () => loginLayout,
+  path: "/employees",
+  component: TabletOrderInterface,
+})
+
 const routeTree = rootRoute.addChildren([
   loginLayout.addChildren([loginRoute]),
-  appLayout.addChildren([salesViewRoute, tabletOrderRoute, orderViewRoute, inventoryViewRoute, expensesViewRoute]),
+  appLayout.addChildren([
+    salesViewRoute,
+    tabletOrderRoute,
+    orderViewRoute,
+    inventoryViewRoute,
+    expensesViewRoute,
+    employeeViewRoute,
+    EmployeeViewOnly, 
+  ]),
 ])
 
 const router = createRouter({ routeTree })

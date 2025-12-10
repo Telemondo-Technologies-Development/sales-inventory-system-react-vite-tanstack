@@ -9,7 +9,7 @@ import {
   View,
   Archive,
   DollarSign,
-  House
+  IdCardLanyard 
 } from "lucide-react"
 import LogoUrl from "/logo.webp"
 
@@ -69,8 +69,8 @@ export default function RootLayout() {
     const isActive = pathname === to || pathname.startsWith(to + "/")
     const color = isActive ? primaryHex : inactiveHex
 
-    const base = "group/nav relative flex items-center gap-3 w-full text-sm font-semibold rounded transition-colors duration-150"
-    const activeExtras = isActive ? "bg-[#eaf4f8] px-3 py-2 rounded-md shadow-sm" : "px-2 py-2"
+    const base = "group/nav relative flex items-center gap-3 w-full text-sm font-semibold rounded-2xl transition-colors duration-150"
+    const activeExtras = isActive ? "bg-[#eaf4f8] px-3 py-2 rounded-2xl shadow-sm" : "px-2 py-2"
 
     return (
       <Link
@@ -104,13 +104,13 @@ export default function RootLayout() {
       {/* mobile header */}
       <header className="w-full md:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-200 flex items-center justify-between px-4 py-2">
         <div className="flex items-center gap-2">
-          <button aria-label="Open menu" onClick={() => setMobileOpen(true)} className="p-2 rounded hover:bg-gray-100">
+          <button aria-label="Open menu" onClick={() => setMobileOpen(true)} className="p-2 rounded-2xl hover:bg-gray-100">
             <AlignStartVertical />
           </button>
           <div className="font-bold text-lg">Serenity</div>
         </div>
         <div className="flex items-center gap-2">
-          <button onClick={handleLogout} className="flex items-center gap-2 text-[#ba1a1a] px-2 py-1 rounded hover:bg-red-50">
+          <button onClick={handleLogout} className="flex items-center gap-2 text-[#ba1a1a] px-2 py-1 rounded-2xl hover:bg-red-50">
             <LogOut className="w-4 h-4" />
             <span className="text-sm">Logout</span>
           </button>
@@ -125,7 +125,7 @@ export default function RootLayout() {
         <div className="flex flex-col h-full w-full">
           <div className="px-3 py-4 flex items-center justify-start">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded flex items-center justify-center text-white font-bold">
+              <div className="w-8 h-8 rounded-2xl flex items-center justify-center text-white font-bold">
                 <img src={LogoUrl}/>
               </div>
               <span className="ml-8 font-bold text-lg truncate text-primary">Serenity</span>
@@ -133,12 +133,12 @@ export default function RootLayout() {
           </div>
 
           <nav className="mt-4 px-2 flex flex-col gap-2 ">
-            <NavLink to="/index" Icon={House}>Home</NavLink>
             <NavLink to="/sales-view" Icon={UserRoundPen}>Sales</NavLink>
-            <NavLink to="/table-orders" Icon={ListOrdered}>Table Orders</NavLink>
-            <NavLink to="/order-view" Icon={View}>Order View</NavLink>
-            <NavLink to="/inventory-view" Icon={Archive}>Inventory View</NavLink>
             <NavLink to="/expenses-view" Icon={DollarSign}>Expenses</NavLink>
+            <NavLink to="/order-view" Icon={View}>Order View</NavLink>
+            <NavLink to="/table-orders" Icon={ListOrdered}>Table Orders</NavLink>
+            <NavLink to="/inventory-view" Icon={Archive}>Inventory View</NavLink>
+            <NavLink to="/employee-view" Icon={IdCardLanyard}>Employee</NavLink>
           </nav>
 
           <div className="mt-auto px-2 py-4">
@@ -173,7 +173,7 @@ export default function RootLayout() {
           </div>
 
           <nav className="mt-4 px-2 flex flex-col gap-2 ">
-            <NavLink to="/index" Icon={House}>Home</NavLink>
+            <NavLink to="/employee-view" Icon={IdCardLanyard}>Employee</NavLink>
             <NavLink to="/sales-view" Icon={UserRoundPen}>Sales</NavLink>
             <NavLink to="/table-orders" Icon={ListOrdered}>Table Orders</NavLink>
             <NavLink to="/order-view" Icon={View}>Order View</NavLink>

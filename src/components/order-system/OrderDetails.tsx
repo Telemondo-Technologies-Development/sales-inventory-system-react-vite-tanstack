@@ -198,15 +198,15 @@ export default function OrderDetails({
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
 
       <div className="relative z-10 w-full max-w-4xl">
-        <div className="bg-white rounded-2xl shadow overflow-hidden">
+        <div className="bg-primary-foreground rounded-2xl shadow overflow-hidden">
           <div className="flex items-center justify-between p-4">
             <div>
-              <h2 id="order-details-title" className="text-lg font-bold text-[#266489]">Order {order.id}</h2>
-              <p className="text-sm text-[#72787e]">Table {order.tableNumber} · {new Date(order.createdAt).toLocaleString()}</p>
+              <h2 id="order-details-title" className="text-lg font-bold text-primary">Order {order.id}</h2>
+              <p className="text-sm text-muted-foreground">Table {order.tableNumber} · {new Date(order.createdAt).toLocaleString()}</p>
             </div>
 
             <div className="flex items-center gap-2">
-              <button ref={closeButtonRef} onClick={onClose} className="p-2 rounded hover:bg-gray-100" aria-label="Close">
+              <button ref={closeButtonRef} onClick={onClose} className="p-2 rounded-2xl hover:bg-gray-100" aria-label="Close">
                 <X />
               </button>
             </div>
@@ -215,14 +215,14 @@ export default function OrderDetails({
           <div className="p-6 max-h-[80vh] overflow-auto space-y-6">
             {/* Items editor */}
             <section>
-              <h3 className="text-sm font-semibold text-[#266489] mb-2">Items</h3>
+              <h3 className="text-sm font-semibold text-primary mb-2">Items</h3>
 
-              <div className="divide-y divide-[#f0f0f3] rounded-md overflow-hidden">
+              <div className="divide-y divide-muted-foreground rounded-2xl overflow-hidden">
                 {draft.items.map((it) => (
-                  <div key={it.id} className="flex items-center justify-between px-4 py-3 bg-white">
+                  <div key={it.id} className="flex items-center justify-between px-4 py-3 bg-primary-foreground">
                     <div className="flex-1">
-                      <div className="font-medium text-sm text-[#72787e]">{it.name}</div>
-                      <div className="text-xs text-[#72787e]">₱{it.price.toFixed(2)}</div>
+                      <div className="font-medium text-sm text-muted-foreground">{it.name}</div>
+                      <div className="text-xs text-muted-foreground">₱{it.price.toFixed(2)}</div>
                     </div>
                     <div className="flex items-center gap-2">
                       <input
@@ -230,17 +230,17 @@ export default function OrderDetails({
                         value={it.quantity}
                         min={1}
                         onChange={(e) => handleChangeQty(it.id, Number(e.target.value))}
-                        className="w-16 px-2 py-1 border rounded text-sm"
+                        className="w-16 px-2 py-1 border rounded-lg text-sm "
                         aria-label={`Quantity for ${it.name}`}
                       />
-                      <div className="font-semibold">₱{(it.price * it.quantity).toFixed(2)}</div>
-                      <button onClick={() => handleRemoveItem(it.id)} className="ml-2 p-2 rounded hover:bg-red-50 text-[#ba1a1a]" aria-label={`Remove ${it.name}`} title="Remove item">
+                      <div className="font-semibold text-primary ">₱{(it.price * it.quantity).toFixed(2)}</div>
+                      <button onClick={() => handleRemoveItem(it.id)} className="ml-2 p-2 rounded-2xl hover:bg-red-50 text-error" aria-label={`Remove ${it.name}`} title="Remove item">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
                 ))}
-                {draft.items.length === 0 && <div className="px-4 py-4 text-sm text-[#6b6b73]">No items</div>}
+                {draft.items.length === 0 && <div className="px-4 py-4 text-sm text-muted-foreground">No items</div>}
               </div>
 
               {/* Add item form (react-hook-form + shadcn primitives) */}
@@ -284,7 +284,7 @@ export default function OrderDetails({
                           </FormItem>
                         )}
                       />
-                      <Button type="submit" className="px-6 py-2 bg-[#266489] text-white">Add</Button>
+                      <Button type="submit" className="px-6 py-2 bg-primary text-primary-foreground">Add</Button>
                     </div>
                   </form>
                 </Form>
@@ -292,35 +292,35 @@ export default function OrderDetails({
             </section>
 
             {/* Notes */}
-            <section>
-              <h3 className="text-sm font-semibold text-[#5d4037] mb-2">Notes</h3>
-              <Textarea value={draft.notes} onChange={(e) => setDraft({ ...draft, notes: e.target.value })} rows={3} />
+            <section className="">
+              <h3 className="text-sm font-semibold text-primary mb-2 ">Notes</h3>
+              <Textarea className="border border-muted" value={draft.notes} onChange={(e) => setDraft({ ...draft, notes: e.target.value })} rows={3} />
             </section>
 
             {/* Totals */}
             <section className="grid grid-cols-3 gap-3 text-sm">
-              <div className="p-3 bg-[#fafafa] rounded border border-[#f0f0f3]">
-                <div className="text-xs text-[#6b6b73]">Subtotal</div>
+              <div className="p-3 bg-muted rounded-2xl border border-muted">
+                <div className="text-xs text-muted-foreground">Subtotal</div>
                 <div className="font-semibold">₱{draft.subtotal.toFixed(2)}</div>
               </div>
-              <div className="p-3 bg-[#fafafa] rounded border border-[#f0f0f3]">
-                <div className="text-xs text-[#6b6b73]">Tax</div>
+              <div className="p-3 bg-muted rounded-2xl border border-muted">
+                <div className="text-xs text-muted-foreground">Tax</div>
                 <div className="font-semibold">₱{draft.tax.toFixed(2)}</div>
               </div>
-              <div className="p-3 bg-white rounded border border-[#f0f0f3]">
-                <div className="text-xs text-[#6b6b73]">Total</div>
-                <div className="text-lg font-bold text-[#266489]">₱{draft.total.toFixed(2)}</div>
+              <div className="p-3 bg-muted rounded-2xl border border-muted">
+                <div className="text-xs text-muted-foreground">Total</div>
+                <div className="text-lg font-bold text-primary">₱{draft.total.toFixed(2)}</div>
               </div>
             </section>
 
             {/* Payments */}
             <section>
-              <h3 className="text-sm font-semibold text-[#266489] mb-2">Payments</h3>
+              <h3 className="text-sm font-semibold text-primary mb-2">Payments</h3>
 
-              <div className="overflow-x-auto rounded border border-[#f5f5f7]">
+              <div className="overflow-x-auto rounded-2xl border border-muted">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="bg-[#fafafa]">
+                    <tr className="bg-gray-200">
                       <th className="px-3 py-2 text-left">Method</th>
                       <th className="px-3 py-2 text-left">Amount</th>
                       <th className="px-3 py-2 text-left">Reference</th>
@@ -338,7 +338,7 @@ export default function OrderDetails({
                     ))}
                     {(draft.paymentRecords || []).length === 0 && (
                       <tr>
-                        <td colSpan={4} className="px-3 py-4 text-center text-[#6b6b73]">No payments recorded</td>
+                        <td colSpan={4} className="px-3 py-4 text-center text-muted">No payments recorded</td>
                       </tr>
                     )}
                   </tbody>
@@ -386,16 +386,16 @@ export default function OrderDetails({
                           <FormControl>
                             <Input {...field} placeholder="Reference (if required)" />
                           </FormControl>
-                          {fieldState.error?.message && <p className="text-xs text-red-600 mt-1">{fieldState.error.message}</p>}
+                          {fieldState.error?.message && <p className="text-xs text-error mt-1">{fieldState.error.message}</p>}
                         </FormItem>
                       )}
                     />
 
                     <div className="sm:col-span-3 flex gap-3 mt-2">
-                      <Button type="submit" className="px-6 py-2 bg-[#266489] text-white" disabled={false}>
+                      <Button type="submit" className="px-6 py-2 bg-primary text-primary-foreground" disabled={false}>
                         Record Payment
                       </Button>
-                      <Button type="button" className="px-6 py-2 bg-[#64597b] text-white" onClick={handleSaveEdits} disabled={!hasChanges}>
+                      <Button type="button" className="px-6 py-2 bg-secondary text-secondary-foreground" onClick={handleSaveEdits} disabled={!hasChanges}>
                         Save Changes
                       </Button>
                     </div>
@@ -405,14 +405,14 @@ export default function OrderDetails({
             </section>
           </div>
 
-          <div className="flex items-center gap-2 justify-end p-4 border-t border-[#f0f0f3]">
+          <div className="flex p-4 justify-end gap-[16px] border-t border-muted">
             {draft.status === "pending" && (
               <Button
                 onClick={() => {
                   onUpdateStatus(draft.id, "served")
                   onClose()
                 }}
-                className="py-2 px-4 bg-[#266489] text-white rounded-2xl hover:bg-[#50606e] transition"
+                className="py-2 px-4 bg-primary text-primary-foreground rounded-2xl hover:bg-primary/90 transition"
               >
                 Mark Served
               </Button>
@@ -424,7 +424,7 @@ export default function OrderDetails({
                   onUpdateStatus(draft.id, "payment")
                   onClose()
                 }}
-                className="py-2 px-4 bg-blue-600 text-white rounded-2xl hover:bg-blue-700 transition"
+                className="py-2 px-4 bg-primary text-primary-foreground rounded-2xl hover:bg-primary/90 transition"
               >
                 Request Payment
               </Button>
@@ -435,12 +435,12 @@ export default function OrderDetails({
                 onDelete(draft.id)
                 onClose()
               }}
-              className="py-2 px-4 bg-white border border-red-100 text-red-700 rounded-lg hover:bg-red-50 transition"
+              className="py-2 px-4 bg-primary-foreground border border-red-100 text-error rounded-2xl hover:bg-red-50 transition"
             >
               Delete
             </Button>
 
-            <Button onClick={onClose} className="py-2 px-4 bg-white border rounded-lg hover:shadow-sm transition">
+            <Button onClick={onClose} className="py-2 px-4 bg-primary-foreground border rounded-2xl hover:shadow-sm transition text-primary">
               Close
             </Button>
           </div>

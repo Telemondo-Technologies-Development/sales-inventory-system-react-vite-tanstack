@@ -5,7 +5,6 @@ export interface MenuItem {
   name: string
   price: number
   category: string
-  // stored as a Blob (webp) for compactness
   image?: Blob | null
   imageType?: string | null
   createdAt: string

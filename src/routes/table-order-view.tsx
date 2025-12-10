@@ -181,17 +181,18 @@ export default function TableOrderView() {
     <div className="min-h-screen p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header (page-level) */}
-        <div className="flex justify-between items-center mb-4 bg-white rounded-xl p-4 shadow-sm elevation-1">
-          <h1 className="text-3xl font-semibold text-primary">Menu</h1>
+        <div className="flex flex-col  items-start mb-4 bg-primary-foreground rounded-2xl p-2 shadow-sm elevation-1">
+          <h1 className="text-3xl font-medium text-primary">Menu</h1>
+          <p className="text-sm text-foreground">Overview of dishes and pricing</p>
         </div>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_360px]">
           {/* Menu Section */}
           <div>
-            <div className="elevation-1 bg-white rounded-2xl p-6">
+            <div className="elevation-1 bg-primary-foreground rounded-2xl p-6">
               {/* sub-header inside the menu container with Add button top-right */}
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold">All dishes</h2>
+                <h2 className="text-xl font-semibold text-primary">All dishes</h2>
                 <div className="flex items-center gap-2">
                   <Button variant="primary" onClick={() => setModalOpen(true)}>
                     Add Menu
@@ -213,18 +214,18 @@ export default function TableOrderView() {
                         <button
                           key={item.id}
                           onClick={() => addToCart(item)}
-                          className="elevation-1 bg-card border border-[#c1c7ce] rounded-xl p-4 hover:elevation-2 hover:border-[#50606e] transition-all group text-left"
+                          className="elevation-1 bg-card border border-border rounded-2xl p-4 hover:elevation-2 hover:border-primary transition-all group text-left"
                         >
                           <div className="w-full h-36 mb-3 overflow-hidden rounded-lg bg-gray-100 flex items-center justify-center">
                             {item.imageUrl ? (
                               <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
                             ) : (
-                              <div className="text-sm text-[#50606e]">No image</div>
+                              <div className="text-sm text-muted-foreground">No image</div>
                             )}
                           </div>
 
                           <div className="flex items-center justify-between">
-                            <p className="font-semibold text-[#50606e] text-sm">{item.name}</p>
+                            <p className="font-semibold text-secondary text-sm">{item.name}</p>
                             <p className="text-primary font-bold mt-2">₱{item.price}</p>
                           </div>
                         </button>
@@ -237,7 +238,7 @@ export default function TableOrderView() {
           </div>
 
           {/* Order Summary Section */}
-          <aside className="elevation-1 bg-white rounded-2xl p-6 h-fit sticky top-6">
+          <aside className="elevation-1 bg-primary-foreground rounded-2xl p-6 h-fit sticky top-6">
             <h2 className="text-xl font-bold text-primary mb-4">Order Summary</h2>
 
             <Form {...form}>
@@ -251,7 +252,7 @@ export default function TableOrderView() {
                       <FormControl>
                         <Input {...field} placeholder="e.g., T-1, T-2" />
                       </FormControl>
-                      {fieldState.error && <p className="text-xs text-red-600 mt-1">{fieldState.error.message}</p>}
+                      {fieldState.error && <p className="text-xs text-error mt-1">{fieldState.error.message}</p>}
                     </FormItem>
                   )}
                 />
@@ -271,13 +272,13 @@ export default function TableOrderView() {
 
                 <div className="mt-4 mb-4 max-h-48 overflow-y-auto bg-muted/30 rounded-lg p-3">
                   {cartItems.length === 0 ? (
-                    <p className="text-[#50606e] text-sm">No items added</p>
+                    <p className="text-muted-foreground text-sm">No items added</p>
                   ) : (
                     cartItems.map((item) => (
                       <div key={item.id} className="flex justify-between items-center mb-3 pb-3 border-b border-border last:border-b-0">
                         <div className="flex-1">
-                          <p className="font-medium text-[#266489] text-sm">{item.name}</p>
-                          <p className="text-xs text-[#50606e]">₱{item.price} x {item.quantity}</p>
+                          <p className="font-medium text-secondary text-sm">{item.name}</p>
+                          <p className="text-xs text-muted-foreground">₱{item.price} x {item.quantity}</p>
                         </div>
                         <div className="flex items-center gap-2">
                           <button
@@ -288,7 +289,7 @@ export default function TableOrderView() {
                           >
                             <Minus className="w-4 h-4 text-primary" />
                           </button>
-                          <span className="w-6 text-center text-sm text-[#50606e] font-semibold">{item.quantity}</span>
+                          <span className="w-6 text-center text-sm text-muted-foreground font-semibold">{item.quantity}</span>
                           <button
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
                             className="p-1 rounded hover:bg-primary-subtle"
@@ -303,7 +304,7 @@ export default function TableOrderView() {
                   )}
                 </div>
 
-                <div className="space-y-2 mb-4 p-3 bg-muted/20 rounded-lg">
+                <div className="space-y-2 mb-4 p-3 bg-muted/20 rounded-2xl">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Subtotal:</span>
                     <span className="font-semibold text-card-foreground">₱{subtotal.toFixed(2)}</span>
@@ -319,7 +320,7 @@ export default function TableOrderView() {
                 </div>
 
                 <div className="flex gap-2">
-                  <Button type="button" variant="outline" onClick={() => { setCartItems([]); form.reset(); }}>
+                  <Button type="button" variant="secondary" onClick={() => { setCartItems([]); form.reset(); }}>
                     Clear
                   </Button>
                   <Button type="submit" variant="primary" size="lg" className="ml-auto" disabled={cartItems.length === 0}>
