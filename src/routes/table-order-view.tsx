@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from "react"
-import { Plus, Minus, Send } from "lucide-react"
-import { useNavigate } from "@tanstack/react-router"
+import { useEffect, useMemo, useRef, useState } from "react"
+import { useRouter } from "@tanstack/react-router"
+import { Plus, Minus, Send, CheckCircle2 } from "lucide-react"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -8,7 +8,6 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import AddMenuModal from "@/components/menu-items/AddMenu"
 import UpdateMenuModal from "@/components/menu-items/UpdateMenu"
 import {
-  addMenuItem,
   getAllMenuItems,
   type MenuItem as DBMenuItem,
 } from "@/database/menu-helper/MenuDexieDB"
@@ -19,6 +18,8 @@ import { Form, FormField, FormItem, FormLabel, FormControl } from "@/components/
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { getCurrentUser } from "@/lib/auth"
 
 /* Form validation */
 const OrderFormSchema = z.object({
@@ -41,12 +42,24 @@ type MenuItemForUI = {
 }
 
 export default function TableOrderView() {
+  const router = useRouter()
+  const current = useMemo(() => getCurrentUser(), [])
+  const serverName = current?.name || current?.username || "Unknown"
+
   const [menuItems, setMenuItems] = useState<MenuItemForUI[]>([])
   const [editOpen, setEditOpen] = useState(false)
-  const [editingItemId, setEditingItemId] = useState<string | null>(null)
+  const [, setEditingItemId] = useState<string | null>(null)
   const [cartItems, setCartItems] = useState<OrderItem[]>([])
   const [modalOpen, setModalOpen] = useState(false)
   const objectUrlRefs = useRef<Record<string, string | undefined>>({}) // track created object URLs to revoke
+  const [showSuccess, setShowSuccess] = useState(false)
+
+  const handleLogout = () => {
+    try {
+      localStorage.removeItem("currentUser")
+    } catch {}
+    router.navigate({ to: "/" })
+  }
 
   const form = useForm<OrderFormValues>({
     resolver: zodResolver(OrderFormSchema),
@@ -161,7 +174,7 @@ export default function TableOrderView() {
       // clear
       setCartItems([])
       form.reset()
-      alert("Order submitted successfully!")
+      setShowSuccess(true)
     } catch (err) {
       console.error("Failed to save order", err)
       form.setError("tableNumber", { type: "server", message: "Failed to submit order. Try again." })
@@ -181,9 +194,20 @@ export default function TableOrderView() {
     <div className="min-h-screen p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header (page-level) */}
-        <div className="flex flex-col  items-start mb-4 bg-primary-foreground rounded-2xl p-2 shadow-sm elevation-1">
-          <h1 className="text-3xl font-medium text-primary">Menu</h1>
-          <p className="text-sm text-foreground">Overview of dishes and pricing</p>
+        <div className="mb-4 bg-primary-foreground rounded-2xl p-2 shadow-sm elevation-1">
+          {/* Mobile: col-1, centered. Tablet/desktop: row, spaced */}
+          <div className="flex flex-col items-center justify-center gap-2 w-full sm:flex-row sm:justify-between sm:items-center">
+            <div className="text-center sm:text-left">
+              <h1 className="text-3xl font-medium text-primary">Menu</h1>
+              <p className="text-sm text-foreground">Overview of dishes and pricing</p>
+            </div>
+            <div className="flex flex-col items-center gap-2 sm:flex-row sm:gap-6 sm:text-sm sm:justify-end">
+              <p className="text-sm text-foreground">Server: <span className="font-semibold text-primary">{serverName}</span></p>
+              <Button variant="danger" onClick={handleLogout}>
+                Logout
+              </Button>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr_360px]">
@@ -191,15 +215,17 @@ export default function TableOrderView() {
           <div>
             <div className="elevation-1 bg-primary-foreground rounded-2xl p-6">
               {/* sub-header inside the menu container with Add button top-right */}
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex flex-col gap-3 mb-6 lg:flex-row lg:items-center lg:justify-between">
                 <h2 className="text-xl font-semibold text-primary">All dishes</h2>
-                <div className="flex items-center gap-2">
-                  <Button variant="primary" onClick={() => setModalOpen(true)}>
-                    Add Menu
-                  </Button>
-                  <Button variant="primary" onClick={() => openEdit()}>
-                    Edit Menu
-                  </Button>
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between lg:justify-end ">
+                  <div className="flex items-center gap-2">
+                    <Button variant="primary" onClick={() => setModalOpen(true)}>
+                      Add Menu
+                    </Button>
+                    <Button variant="primary" onClick={() => openEdit()}>
+                      Edit Menu
+                    </Button>
+                  </div>
                 </div>
               </div>
 
@@ -209,16 +235,21 @@ export default function TableOrderView() {
                 return (
                   <div key={category} className="mb-8">
                     <h3 className="text-lg font-semibold mb-4 text-primary">{category}</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {categoryItems.map((item) => (
                         <button
                           key={item.id}
                           onClick={() => addToCart(item)}
                           className="elevation-1 bg-card border border-border rounded-2xl p-4 hover:elevation-2 hover:border-primary transition-all group text-left"
                         >
-                          <div className="w-full h-36 mb-3 overflow-hidden rounded-lg bg-gray-100 flex items-center justify-center">
+                          <div className="w-full aspect-square h-36 mb-3 overflow-hidden rounded-lg bg-gray-100 flex items-center justify-center">
                             {item.imageUrl ? (
-                              <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                              <img
+                                src={item.imageUrl}
+                                alt={item.name}
+                                className="w-fit h-full object-cover object-center p-2"
+                                style={{ background: "#f3f4f6" }}
+                              />
                             ) : (
                               <div className="text-sm text-muted-foreground">No image</div>
                             )}
@@ -333,6 +364,22 @@ export default function TableOrderView() {
           </aside>
         </div>
       </div>
+
+      {/* Success Modal */}
+      <Dialog open={showSuccess} onOpenChange={setShowSuccess}>
+        <DialogContent className="max-w-xs text-center">
+          <DialogHeader>
+            <div className="flex flex-col items-center gap-2">
+              <CheckCircle2 className="w-12 h-12 text-green-500 mx-auto" />
+              <DialogTitle className="text-green-700">Order Submitted!</DialogTitle>
+            </div>
+          </DialogHeader>
+          <div className="text-foreground text-sm mb-2">Your order has been placed successfully.</div>
+          <DialogFooter>
+            <Button variant="primary" onClick={() => setShowSuccess(false)} className="w-full">OK</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Menu Modals */}
       <AddMenuModal

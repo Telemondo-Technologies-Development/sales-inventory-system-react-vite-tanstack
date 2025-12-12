@@ -13,7 +13,6 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 import { processImageFile } from "@/lib/image"
@@ -30,23 +29,18 @@ const ALL_TASKS: EmployeeTask[] = ["cashier", "kitchen", "waiter", "runner", "ba
 const ROLES: EmployeeRole[] = ["admin", "manager", "employee"]
 
 /* Zod schema */
+
 const EmployeeSchema = z.object({
-  username: z.string().min(0).optional(),
-  password: z.string().min(0).optional(), // optional for edits
-  name: z.string().min(1, "Name is required"),
-  age: z
-    .union([z.string(), z.number()])
-    .optional()
-    .transform((v) => {
-      if (v === "" || v === undefined) return undefined
-      const n = Number(v)
-      return Number.isNaN(n) ? undefined : n
-    })
-    .refine((val) => val === undefined || val >= 15, { message: "Age must be 15 or older" }),
-  email: z.string().email().optional().or(z.literal("")).transform((v) => (v === "" ? undefined : v)).optional(),
-  phone: z.string().min(0).optional(),
+  username: z.string().trim().min(0).optional(),
+  password: z.string().trim().min(0).optional(),
+  name: z.string().trim().min(1, "Name is required"),
+  age: z.coerce.number().min(15, { message: "Age must be 15 or older" }).optional(),
+  email: z.string().trim().email({ message: "Invalid email" }).optional().or(z.literal("")).transform((v) => (v === "" ? undefined : v)).optional(),
+  phone: z.string().trim().optional().refine((v) => !v || /^\+?[0-9\s()-]{7,}$/.test(v), {
+    message: "Enter a valid phone number",
+  }),
   role: z.enum(["admin", "manager", "employee"]).default("employee"),
-  tasks: z.array(z.enum(["cashier", "kitchen", "waiter", "runner", "bar"])).optional(),
+  tasks: z.array(z.enum(["cashier", "kitchen", "waiter", "runner", "bar"])).default([]).optional(),
 })
 
 type EmployeeFormValues = z.infer<typeof EmployeeSchema>
@@ -72,7 +66,7 @@ export default function EmployeeModal({
   const [resumeBlob, setResumeBlob] = useState<Blob | null | undefined>(undefined)
 
   const form = useForm<EmployeeFormValues>({
-    resolver: zodResolver(EmployeeSchema),
+    resolver: zodResolver(EmployeeSchema) as any,
     defaultValues: {
       username: "",
       password: "",
@@ -220,6 +214,10 @@ export default function EmployeeModal({
       setError("Name is required")
       return
     }
+    if (!editId && (!values.password || values.password.trim().length < 6)) {
+      setError("Password must be at least 6 characters for new employees")
+      return
+    }
 
     setSaving(true)
     try {
@@ -266,6 +264,7 @@ export default function EmployeeModal({
           <h3 className="text-lg font-semibold mb-4">{editId ? "Edit Employee" : "Add Employee"}</h3>
 
           {error && <div className="text-sm text-error mb-3">{error}</div>}
+          {loading && <div className="text-sm text-muted-foreground mb-3">Loading…</div>}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <FormField
@@ -398,17 +397,29 @@ export default function EmployeeModal({
               </div>
             </div>
 
-            <div className="">
+            <FormItem>
               <FormLabel>Photo</FormLabel>
-              <input type="file" accept="image/*" onChange={handlePhotoChange} />
-              {photoPreview && <img src={photoPreview} alt="preview" className="mt-2 w-28 h-20 object-cover rounded" />}
-            </div>
+              <FormControl>
+                <Input type="file" accept="image/*" onChange={handlePhotoChange} />
+              </FormControl>
+              <FormDescription>Upload a clear headshot (JPEG/PNG).</FormDescription>
+              {photoPreview && (
+                <img src={photoPreview} alt="preview" className="mt-2 w-28 h-20 object-cover rounded" />
+              )}
+              <FormMessage />
+            </FormItem>
 
-            <div className="sm:col-span-2">
+            <FormItem className="sm:col-span-2">
               <FormLabel>Resume (PDF / DOCX)</FormLabel>
-              <input type="file" accept=".pdf,.doc,.docx" onChange={handleResumeChange} />
-              {resumeName && <div className="mt-2 text-sm text-muted-foreground">{resumeName}</div>}
-            </div>
+              <FormControl>
+                <Input type="file" accept=".pdf,.doc,.docx" onChange={handleResumeChange} />
+              </FormControl>
+              <FormDescription>Optional. Accepted formats: PDF, DOC, DOCX.</FormDescription>
+              {resumeName && (
+                <div className="mt-2 text-sm text-muted-foreground ">{resumeName}</div>
+              )}
+              <FormMessage />
+            </FormItem>
           </div>
 
           <div className="mt-4 flex justify-end gap-2">

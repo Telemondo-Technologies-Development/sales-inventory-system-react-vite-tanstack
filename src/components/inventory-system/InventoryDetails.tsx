@@ -1,7 +1,14 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { X } from "lucide-react"
+import { z } from "zod"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
 import { addExpense, type Expense } from "../../database/expenses-helper/ExpensesDexieDB"
 
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button"
 
 type Props = {
   open: boolean
@@ -9,63 +16,74 @@ type Props = {
   onSaved?: (expense: Expense) => void
 }
 
-/**
- * ExpenseModal
- * - centered modal, inner content scrolls if long
- * - records an expense to Dexie via addExpense()
- */
+const InventorySchema = z.object({
+  item: z.string().trim().min(1, "Please enter an item description."),
+  quantity: z.coerce.number().min(1, "Quantity must be at least 1."),
+  unit: z.string().trim().min(1, "Unit is required."),
+  unitWeight: z.string().trim().optional(),
+  cost: z.coerce.number().min(0.01, "Cost must be greater than zero."),
+  supplier: z.string().trim().optional(),
+  date: z.string().min(1, "Date is required."),
+  notes: z.string().trim().optional(),
+})
+type InventoryFormValues = z.infer<typeof InventorySchema>
+
 export default function InventoryDetails({ open, onClose, onSaved }: Props) {
-  const [item, setItem] = useState("")
-  const [quantity, setQuantity] = useState<number>(1)
-  const [unit, setUnit] = useState<string>("bag")
-  const [unitWeight, setUnitWeight] = useState<string>("25kg")
-  const [cost, setCost] = useState<number>(0)
-  const [supplier, setSupplier] = useState<string>("")
-  const [date, setDate] = useState<string>(new Date().toISOString().slice(0, 10))
-  const [notes, setNotes] = useState<string>("")
   const [saving, setSaving] = useState(false)
 
+  const form = useForm<InventoryFormValues>({
+    resolver: zodResolver(InventorySchema) as any,
+    mode: "onChange",
+    defaultValues: {
+      item: "",
+      quantity: 1,
+      unit: "bag",
+      unitWeight: "25kg",
+      cost: 0,
+      supplier: "",
+      date: new Date().toISOString().slice(0, 10),
+      notes: "",
+    },
+  })
+
   useEffect(() => {
-    if (open) {
-      // reset defaults when opening
-      setItem("")
-      setQuantity(1)
-      setUnit("bag")
-      setUnitWeight("25kg")
-      setCost(0)
-      setSupplier("")
-      setDate(new Date().toISOString().slice(0, 10))
-      setNotes("")
-      setSaving(false)
-    }
+    if (!open) return
+    form.reset({
+      item: "",
+      quantity: 1,
+      unit: "bag",
+      unitWeight: "25kg",
+      cost: 0,
+      supplier: "",
+      date: new Date().toISOString().slice(0, 10),
+      notes: "",
+    })
+    setSaving(false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
   if (!open) return null
 
-  const handleSave = async () => {
-    if (!item.trim()) return alert("Please enter an item description.")
-    if (quantity <= 0) return alert("Quantity must be at least 1.")
-    if (cost <= 0) return alert("Cost must be greater than zero.")
-
+  const onSubmit = async (values: InventoryFormValues) => {
     const expense: Expense = {
       id: `exp-${Date.now()}`,
-      item: item.trim(),
-      quantity,
-      unit,
-      unitWeight: unitWeight.trim() || undefined,
-      cost: Number(cost),
-      supplier: supplier.trim() || undefined,
-      date: new Date(date).toISOString(),
-      notes: notes.trim() || undefined,
+      item: values.item.trim(),
+      quantity: values.quantity,
+      unit: values.unit.trim(),
+      unitWeight: values.unitWeight?.trim() || undefined,
+      cost: values.cost,
+      supplier: values.supplier?.trim() || undefined,
+      date: new Date(values.date).toISOString(),
+      notes: values.notes?.trim() || undefined,
     }
-
     setSaving(true)
     try {
-      await addExpense(expense as any) // runtime function from expenses-helper  avoid using any
+      await addExpense(expense)
       onSaved?.(expense)
       onClose()
     } catch (err) {
       console.error("Failed to save expense", err)
+      form.setError("item", { type: "server", message: "Failed to save expense. Try again." })
       alert("Failed to save expense. Try again.")
     } finally {
       setSaving(false)
@@ -83,56 +101,129 @@ export default function InventoryDetails({ open, onClose, onSaved }: Props) {
               <X />
             </button>
           </div>
-
           <div className="p-6 max-h-[80vh] overflow-auto space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Item (description)</label>
-              <input value={item} onChange={(e) => setItem(e.target.value)} placeholder="Bag of flour 25kg" className="w-full px-3 py-2 border rounded" />
-            </div>
-
-            <div className="grid grid-cols-3 gap-2">
-              <div>
-                <label className="block text-sm font-medium mb-1">Quantity</label>
-                <input type="number" min={1} value={quantity} onChange={(e) => setQuantity(Number(e.target.value || 0))} className="w-full px-3 py-2 border rounded" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Unit</label>
-                <input value={unit} onChange={(e) => setUnit(e.target.value)} placeholder="bag" className="w-full px-3 py-2 border rounded" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Unit weight</label>
-                <input value={unitWeight} onChange={(e) => setUnitWeight(e.target.value)} placeholder="25kg" className="w-full px-3 py-2 border rounded" />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="block text-sm font-medium mb-1">Total cost (₱)</label>
-                <input type="number" min={0} value={cost} onChange={(e) => setCost(Number(e.target.value || 0))} className="w-full px-3 py-2 border rounded" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Supplier</label>
-                <input value={supplier} onChange={(e) => setSupplier(e.target.value)} placeholder="Rafsky Trading" className="w-full px-3 py-2 border rounded" />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="block text-sm font-medium mb-1">Date</label>
-                <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="w-full px-3 py-2 border rounded" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Notes</label>
-                <input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Invoice #, delivery note..." className="w-full px-3 py-2 border rounded" />
-              </div>
-            </div>
-          </div>
-
-          <div className="flex items-center justify-end gap-2 p-4 border-t">
-            <button onClick={onClose} className="py-2 px-4 bg-white border rounded">Cancel</button>
-            <button onClick={handleSave} disabled={saving} className="py-2 px-4 bg-[#8f4c37] text-white rounded">
-              {saving ? "Saving…" : "Save Expense"}
-            </button>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="item"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Item (description)</FormLabel>
+                      <FormControl>
+                        <Input {...field} placeholder="Bag of flour 25kg" />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="grid grid-cols-3 gap-2">
+                  <FormField
+                    control={form.control}
+                    name="quantity"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Quantity</FormLabel>
+                        <FormControl>
+                          <Input {...field} type="number" min={1} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="unit"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Unit</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="bag" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="unitWeight"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Unit weight</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="25kg" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <FormField
+                    control={form.control}
+                    name="cost"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Total cost (₱)</FormLabel>
+                        <FormControl>
+                          <Input {...field} type="number" min={0.01} step="0.01" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="supplier"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Supplier</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Rafsky Trading" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <FormField
+                    control={form.control}
+                    name="date"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Date</FormLabel>
+                        <FormControl>
+                          <Input {...field} type="date" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="notes"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Notes</FormLabel>
+                        <FormControl>
+                          <Textarea {...field} placeholder="Invoice #, delivery note..." rows={1} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="flex items-center justify-end gap-2 pt-2 border-t mt-2">
+                  <Button type="button" variant="ghost" onClick={onClose} className="py-2 px-4">
+                    Cancel
+                  </Button>
+                  <Button type="submit" className="py-2 px-4 cursor-pointer" variant="primary" disabled={saving || !form.formState.isValid}>
+                    {saving ? "Saving…" : "Save Expense"}
+                  </Button>
+                </div>
+              </form>
+            </Form>
           </div>
         </div>
       </div>

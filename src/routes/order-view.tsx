@@ -1,7 +1,6 @@
-"use client"
-
 import { useState, useEffect, useCallback } from "react"
-import { CheckCircle2, Clock, CreditCard, Trash2 } from "lucide-react"
+import { CheckCircle2, Clock, CreditCard, Trash2, type LucideIcon } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import {
   getOrders,
   updateOrderStatus as dbUpdateOrderStatus,
@@ -13,7 +12,6 @@ import {
 import OrderDetailsModal from "../components/order-system/OrderDetails"
 
 import type { Order, PaymentRecord } from "../database/order-helper/OrderDexieDB"
-
 
 export default function OrdersView() {
   const [orders, setOrders] = useState<Order[]>([])
@@ -102,7 +100,7 @@ export default function OrdersView() {
 
   const statusConfig: Record<
     "pending" | "served" | "payment",
-    { label: string; icon: any; color: string; bg: string; border: string }
+    { label: string; icon: LucideIcon; color: string; bg: string; border: string }
   > = {
     pending: {
       label: "Pending",
@@ -132,28 +130,25 @@ export default function OrdersView() {
   const balanceAmount = (o: Order) => +(o.total - paidAmount(o))
 
   return (
-    <div className="p-6">
-      <div className="flex flex-col items-start mb-[16px] bg-primary-foreground rounded-xl p-2 elevation-1 ">
+    <div className="p-4 sm:p-6">
+      <div className="flex flex-col items-start mb-4 bg-primary-foreground rounded-xl p-2 elevation-1 ">
         <h1 className="text-3xl font-medium text-primary">Order Management</h1>
         <p className="text-sm text-muted-foreground">Overview of orders and fulfillment</p>
       </div>
 
       {/* Navigation (semantic) - only Pending, Served, Payment */}
       <nav aria-label="Order sections" className="mb-6">
-        <ul className="flex flex-wrap gap-3">
+        <ul className="flex flex-wrap gap-2">
           {(["pending", "served", "payment"] as const).map((status) => (
             <li key={status}>
-              <button
+              <Button
                 onClick={() => setFilter(status)}
-                className={`px-4 py-2 rounded-lg font-semibold transition-all text-sm ${
-                  filter === status
-                    ? "bg-primary text-primary-foreground elevation-1"
-                    : "bg-primary-foreground text-primary elevation-1 hover:border-primary"
-                }`}
+                size="sm"
+                variant={filter === status ? "primary" : "outline"}
                 aria-pressed={filter === status}
               >
                 {status.charAt(0).toUpperCase() + status.slice(1)}
-              </button>
+              </Button>
             </li>
           ))}
         </ul>
@@ -167,18 +162,18 @@ export default function OrdersView() {
         // Payment table view (compact)
         <section aria-labelledby="payments-heading">
           <h2 id="payments-heading" className="sr-only">Payment Orders</h2>
-          <div className="overflow-x-auto bg-primary-foreground rounded-2xl elevation-1 ">
-            <table className="w-full text-sm">
+          <div className="overflow-x-auto bg-primary-foreground rounded-2xl elevation-1">
+            <table className="w-full text-sm min-w-[680px] sm:min-w-[860px]">
               <thead>
                 <tr className="bg-gray-200">
-                  <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Order</th>
-                  <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Table</th>
-                  <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Total</th>
-                  <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Paid</th>
-                  <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Balance</th>
-                  <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Last Payment</th>
-                  <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Payment Method</th>
-                  <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Actions</th>
+                  <th className="sticky top-0 z-20 px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Order</th>
+                  <th className="sticky top-0 z-20 px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Table</th>
+                  <th className="sticky top-0 z-20 px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Total</th>
+                  <th className="sticky top-0 z-20 px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200 hidden sm:table-cell">Paid</th>
+                  <th className="sticky top-0 z-20 px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Balance</th>
+                  <th className="sticky top-0 z-20 px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200 hidden md:table-cell">Last Payment</th>
+                  <th className="sticky top-0 z-20 px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200 hidden lg:table-cell">Payment Method</th>
+                  <th className="sticky top-0 z-20 px-4 py-3 text-left text-sm font-semibold text-gray-600 border-b border-gray-200">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -189,15 +184,20 @@ export default function OrdersView() {
 
                   return (
                     <tr key={o.id} className="border-t border-gray-200 hover:bg-gray-50">
-                      <td className="px-3 py-2">{o.id}</td>
+                      <td className="px-3 py-2 text-xs sm:text-sm max-w-[220px] truncate">{o.id}</td>
                       <td className="px-3 py-2">{o.tableNumber}</td>
-                      <td className="px-3 py-2">₱{o.total.toFixed(2)}</td>
-                      <td className="px-3 py-2">₱{paid.toFixed(2)}</td>
-                      <td className="px-3 py-2">₱{balance.toFixed(2)}</td>
-                      <td className="px-3 py-2">{lastPayment ? new Date(lastPayment.createdAt).toLocaleString() : "-"}</td>
+                      <td className="px-3 py-2 whitespace-nowrap tabular-nums">
+                        ₱{o.total.toFixed(2)}
+                        <div className="sm:hidden text-xs text-muted-foreground">
+                          Paid: ₱{paid.toFixed(2)}
+                        </div>
+                      </td>
+                      <td className="px-3 py-2 whitespace-nowrap tabular-nums hidden sm:table-cell">₱{paid.toFixed(2)}</td>
+                      <td className="px-3 py-2 whitespace-nowrap tabular-nums">₱{balance.toFixed(2)}</td>
+                      <td className="px-3 py-2 hidden md:table-cell">{lastPayment ? new Date(lastPayment.createdAt).toLocaleString() : "-"}</td>
 
                       {/* Payment Method column: show last payment method or a clear "No payments yet" statement */}
-                      <td className="px-3 py-2">
+                      <td className="px-3 py-2 hidden lg:table-cell">
                         {lastPayment ? (
                           <span className="inline-flex items-center gap-2 px-2 py-1 rounded-full bg-gray-100 text-sm font-medium text-gray-700">
                             <span className="uppercase">{lastPayment.method}</span>
@@ -209,20 +209,22 @@ export default function OrdersView() {
 
                       <td className="px-3 py-2 text-center">
                         <div className="inline-flex gap-2">
-                          <button
+                          <Button
                             onClick={() => setSelectedOrder(o)}
-                            className="px-2 py-1 bg-white border border-[#e6e6e9] rounded text-sm hover:shadow-sm"
+                            size="sm"
+                            variant="outline"
                             title="See details"
                           >
                             See
-                          </button>
-                          <button
+                          </Button>
+                          <Button
                             onClick={() => deleteOrder(o.id)}
-                            className="px-2 py-1 bg-primary-foreground border border-red-100 text-error rounded text-sm hover:bg-red-50"
+                            size="icon-sm"
+                            variant="destructive"
                             title="Delete"
                           >
                             <Trash2 className="w-4 h-4" />
-                          </button>
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -243,7 +245,7 @@ export default function OrdersView() {
         // Grid view for pending/served
         <section aria-labelledby="orders-heading">
           <h2 id="orders-heading" className="sr-only">Orders</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {filteredOrders.map((order) => {
               const config = statusConfig[order.status]
               const StatusIcon = config.icon
@@ -260,7 +262,7 @@ export default function OrdersView() {
                         Table: <span className="font-semibold">{order.tableNumber}</span>
                       </p>
                     </div>
-                    <div className="flex-shrink-0">
+                    <div className="shrink-0">
                       <StatusIcon className={`w-7 h-7 ${config.color}`} />
                     </div>
                   </header>
@@ -299,37 +301,43 @@ export default function OrdersView() {
                   <footer className="mt-auto flex flex-col sm:flex-row gap-4">
                     <div className="flex gap-2 flex-1">
                       {order.status === "pending" && (
-                        <button
+                        <Button
                           onClick={() => updateOrderStatus(order.id, "served")}
-                          className="flex-1 py-2 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/80 transition text-sm"
+                          className="flex-1"
+                          variant="primary"
+                          size="sm"
                         >
                           Mark Served
-                        </button>
+                        </Button>
                       )}
                       {order.status === "served" && (
-                        <button
+                        <Button
                           onClick={() => updateOrderStatus(order.id, "payment")}
-                          className="flex-1 py-2 bg-secondary text-secondary-foreground rounded-lg font-semibold hover:bg-secondary/80 transition text-sm"
+                          className="flex-1"
+                          variant="secondary"
+                          size="sm"
                         >
                           Request Payment
-                        </button>
+                        </Button>
                       )}
 
-                      <button
+                      <Button
                         onClick={() => setSelectedOrder(order)}
-                        className="py-2 px-3 bg-primary-foreground border border-primary-foreground rounded-lg text-primary hover:shadow-sm transition text-sm"
+                        variant="outline"
+                        size="sm"
                       >
                         See Details
-                      </button>
+                      </Button>
                     </div>
 
-                    <button
+                    <Button
                       onClick={() => deleteOrder(order.id)}
-                      className="py-2 px-3 bg-primary-foreground border border-red-100 text-error rounded-2xl hover:bg-red-50 transition text-sm"
+                      variant="destructive"
+                      size="icon-sm"
                       title="Delete order"
                     >
                       <Trash2 className="w-4 h-4" />
-                    </button>
+                    </Button>
                   </footer>
                 </article>
               )

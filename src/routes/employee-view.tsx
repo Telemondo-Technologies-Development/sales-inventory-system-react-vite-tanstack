@@ -1,10 +1,12 @@
-import React, { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { useRouter } from "@tanstack/react-router"
-import { Trash2, Edit2 } from "lucide-react"
+import { Trash2, Edit2, Search } from "lucide-react"
 import { getCurrentUser } from "@/lib/auth"
 import { getAllEmployees, deleteEmployee, type Employee } from "@/database/employee-helper/EmployeeDexieDB"
 import EmployeeModal from "@/components/employee-system/EmployeeDetails"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 /**
  * EmployeeView
@@ -15,6 +17,10 @@ import { Button } from "@/components/ui/button"
 export default function EmployeeView() {
   const router = useRouter()
   const current = useMemo(() => getCurrentUser(), [])
+  const currentRole = current?.role
+  const canManageEmployees = currentRole === "admin" || currentRole === "manager"
+  const canDeleteEmployees = currentRole === "admin"
+
   const [employees, setEmployees] = useState<Employee[]>([])
   const [filtered, setFiltered] = useState<Employee[]>([])
   const [query, setQuery] = useState("")
@@ -38,18 +44,20 @@ export default function EmployeeView() {
     const all = await getAllEmployees()
     setEmployees(all)
     setFiltered(all)
+
     // cleanup & prepare object urls
     Object.values(objectUrls.current).forEach((u) => {
-      try { URL.revokeObjectURL(u) } catch {}
+      try {
+        URL.revokeObjectURL(u)
+      } catch {}
     })
     objectUrls.current = {}
-    all.forEach((it) => {
-      if (it.photo) {
-        try {
-          objectUrls.current[it.id] = URL.createObjectURL(it.photo)
-        } catch {}
-      }
-    })
+    for (const it of all) {
+      if (!it.photo) continue
+      try {
+        objectUrls.current[it.id] = URL.createObjectURL(it.photo)
+      } catch {}
+    }
   }
 
   useEffect(() => {
@@ -73,7 +81,7 @@ export default function EmployeeView() {
   }, [employees, query, roleFilter, taskFilter])
 
   async function handleDelete(id: string) {
-    if (current.role !== "admin") {
+    if (!canDeleteEmployees) {
       alert("Only admins can delete users")
       return
     }
@@ -85,57 +93,98 @@ export default function EmployeeView() {
 
 
   return (
-    <div className="p-4">
-      <section className="">
-        <header className="flex justify-between items-center bg-primary-foreground mb-[16px] rounded-xl p-2 elevation-1 ">
-          <div className="">
-            <h1 className="text-3xl font-medium text-primary">Employees Management</h1>
-            <p className="text-sm text-foreground">Manage staff accounts & roles</p>
-          </div>
+    <div className="p-4 sm:p-6">
+      <section>
+        <div className="mb-4 rounded-2xl bg-primary-foreground p-4 elevation-1">
+          <header className="flex flex-col gap-4 lg:flex-row lg:items-center">
+            <div className="w-full lg:w-[570px] ">
+              <h1 className="text-3xl font-medium text-primary whitespace-normal wrap-break-word">Employees Management</h1>
+              <p className="text-sm text-foreground">Manage staff accounts & roles</p>
+            </div>
 
-          <div className="flex items-center gap-3">
-            <input placeholder="Search by name or username" value={query} onChange={(e) => setQuery(e.target.value)} className="px-3 py-2 border rounded-2xl" />
-            <select value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)} className="px-3 py-2 border rounded-2xl">
-              <option value="all">All roles</option>
-              <option value="admin">Admin</option>
-              <option value="manager">Manager</option>
-              <option value="employee">Employee</option>
-            </select>
-            <select value={taskFilter} onChange={(e) => setTaskFilter(e.target.value)} className="px-3 py-2 border rounded-2xl">
-              <option value="all">All tasks</option>
-              <option value="cashier">Cashier</option>
-              <option value="kitchen">Kitchen</option>
-              <option value="waiter">Waiter</option>
-              <option value="runner">Runner</option>
-              <option value="bar">Bar</option>
-            </select>
+            <div className="grid grid-cols-1 gap-3 w-full lg:flex lg:flex-wrap lg:items-center lg:justify-end">
+              <div className="relative w-full lg:w-80">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
+                <Input
+                  placeholder="Search by name or username"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
 
-            {/* Only admin (or manager) can add users; admin is required to "register" */}
-            {["admin", "manager"].includes(current.role) && (
-              <Button variant="primary" onClick={() => { setEditId(null); setModalOpen(true) }}>
-                Add Employee
+              <div>
+                <Select value={roleFilter} onValueChange={setRoleFilter}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="All roles" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All roles</SelectItem>
+                    <SelectItem value="admin">Admin</SelectItem>
+                    <SelectItem value="manager">Manager</SelectItem>
+                    <SelectItem value="employee">Employee</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <Select value={taskFilter} onValueChange={setTaskFilter}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="All tasks" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All tasks</SelectItem>
+                    <SelectItem value="cashier">Cashier</SelectItem>
+                    <SelectItem value="kitchen">Kitchen</SelectItem>
+                    <SelectItem value="waiter">Waiter</SelectItem>
+                    <SelectItem value="runner">Runner</SelectItem>
+                    <SelectItem value="bar">Bar</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Only admin/manager can add users */}
+              {canManageEmployees ? (
+                <Button
+                  variant="primary"
+                  onClick={() => {
+                    setEditId(null)
+                    setModalOpen(true)
+                  }}
+                  className="w-full lg:w-auto"
+                >
+                  Add Employee
+                </Button>
+              ) : (
+                <div className="hidden lg:block" />
+              )}
+
+              <Button variant="outline" onClick={() => load()} className="w-full lg:w-auto">
+                Refresh
               </Button>
-            )}
-
-            <Button variant="outline"  onClick={() => load()}>Refresh</Button>
-          </div>
-        </header>
+            </div>
+          </header>
+        </div>
 
         <section aria-labelledby="employees-heading">
           <h2 id="employees-heading" className="sr-only">Employees</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[16px]">
+          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
             {filtered.map((emp) => {
               const photo = objectUrls.current[emp.id]
               return (
-                <article key={emp.id} className="flex flex-col h-full rounded-xl p-5 border border-border bg-primary-foreground elevation-1">
+                <article key={emp.id} className="flex flex-col h-full rounded-2xl p-5 bg-primary-foreground elevation-1">
                   <header className="flex items-start justify-between gap-4 mb-4">
-                    <div className="flex items-center gap-[16px]">
+                    <div className="flex items-center">
                       <div className="w-16 h-16 rounded-2xl bg-gray-100 overflow-hidden flex items-center justify-center">
-                        {photo ? <img src={photo} alt={emp.name} className="w-full h-full object-cover" /> : <div className="text-sm text-[#6b6b73]">No photo</div>}
+                        {photo ? (
+                          <img src={photo} alt={emp.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="text-sm text-muted-foreground">No photo</div>
+                        )}
                       </div>
                       <div>
                         <p className="text-xs text-foreground">Employee</p>
-                        <p className="font-bold text-lg text-primary">{emp.name}</p>
+                        <p className="font-bold text-lg text-primary whitespace-normal wrap-break-word">{emp.name}</p>
                         <p className="text-sm text-foreground mt-1">{emp.username ? `@${emp.username}` : ""}</p>
                       </div>
                     </div>
@@ -174,17 +223,17 @@ export default function EmployeeView() {
 
                   <footer className="mt-auto flex items-center justify-between gap-4">
                     <div className="flex gap-2 flex-1">
-                      <Button variant="ghost" className="rounded-2xl" onClick={() => { setEditId(emp.id); setModalOpen(true) }}>
+                      <Button variant="outline" className="rounded-2xl" onClick={() => { setEditId(emp.id); setModalOpen(true) }}>
                         <Edit2 className="w-4 h-4" /> Edit
                       </Button>
 
-                      <Button variant="outline" className="rounded-2xl" onClick={() => { /* view profile: open another modal or route */ }}>
+                      <Button variant="outline" className="rounded-2xl" disabled>
                         View
                       </Button>
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <Button variant="destructive"  onClick={() => handleDelete(emp.id)}>
+                      <Button variant="danger" onClick={() => handleDelete(emp.id)} disabled={!canDeleteEmployees}>
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>

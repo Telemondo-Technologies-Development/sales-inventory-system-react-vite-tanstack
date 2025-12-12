@@ -1,1 +1,1 @@
-import Dexie from "dexie"
+export {}

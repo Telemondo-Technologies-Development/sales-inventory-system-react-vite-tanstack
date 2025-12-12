@@ -1,6 +1,6 @@
 
 
-import React, { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { getExpenses } from "../database/expenses-helper/ExpensesDexieDB"
 import { getOrders } from "../database/order-helper/OrderDexieDB"
 import {
@@ -18,12 +18,10 @@ import type { Expense } from "../database/expenses-helper/ExpensesDexieDB"
 export default function SalesView() {
   const [orders, setOrders] = useState<Order[]>([])
   const [expenses, setExpenses] = useState<Expense[]>([])
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let mounted = true
     ;(async () => {
-      setLoading(true)
       try {
         const [o, ex] = await Promise.all([getOrders(), getExpenses()])
         if (!mounted) return
@@ -31,8 +29,6 @@ export default function SalesView() {
         setExpenses(ex)
       } catch (err) {
         console.error("Failed to load dashboard data", err)
-      } finally {
-        if (mounted) setLoading(false)
       }
     })()
     return () => {

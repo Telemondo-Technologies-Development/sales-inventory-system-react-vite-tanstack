@@ -1,13 +1,14 @@
 
 
-import React, { useEffect, useState } from "react"
-import { AlertTriangle, Plus, Edit2, Save, X, Trash2 } from "lucide-react"
+import { useEffect, useState } from "react"
+import { AlertTriangle, Edit2, Save, X, Trash2 } from "lucide-react"
+import { Button } from "../components/ui/button"
+import { Input } from "../components/ui/input"
 import {
   getIngredients,
   updateIngredient as dbUpdateIngredient,
   deleteIngredient as dbDeleteIngredient,
 } from "../database/inventory-helper/InventoryDexieDB"
-import ExpenseModal from "../components/inventory-system/InventoryDetails"
 
 import type { Ingredient } from "../database/inventory-helper/InventoryDexieDB"
 
@@ -17,6 +18,7 @@ export default function InventoryView() {
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState<Partial<Ingredient>>({})
   const [loading, setLoading] = useState(true)
+  const [expandedId, setExpandedId] = useState<string | null>(null)
   
   useEffect(() => {
     ;(async () => {
@@ -74,18 +76,21 @@ export default function InventoryView() {
   }
 
   return (
-    <div className="p-8">
-      <div className="flex flex-col items-start mb-6 bg-primary-foreground rounded-2xl p-2 elevation-1 border border-gray-200">
-        <h1 className="text-3xl font-medium text-primary">Inventory Management</h1>
-        <p className="text-sm text-muted-foreground">Overview of restaurant inventory and supplies</p>
-
+    <div className="p-4 sm:p-6">
+      <div className="mb-4 rounded-2xl bg-primary-foreground p-4 elevation-1">
+        <header className="flex flex-col gap-2">
+          <div className="w-full">
+            <h1 className="text-2xl font-medium text-primary whitespace-normal wrap-break-word">Inventory Management</h1>
+            <p className="text-sm text-foreground">Overview of restaurant inventory and supplies</p>
+          </div>
+        </header>
       </div>
 
       {/* Low Stock Alerts */}
       {lowStockItems.length > 0 && (
         <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-xl shadow-sm">
           <div className="flex items-start gap-3">
-            <AlertTriangle className="w-6 h-6 text-yellow-700 flex-shrink-0 mt-0.5" />
+            <AlertTriangle className="w-6 h-6 text-yellow-700 shrink-0 mt-0.5" />
             <div>
               <h3 className="font-bold text-yellow-900 mb-2">Low Stock Warning</h3>
               <ul className="text-sm text-yellow-800 space-y-1">
@@ -101,9 +106,142 @@ export default function InventoryView() {
       )}
 
       {/* Ingredients Table */}
-      <div className="bg-primary-foreground rounded-2xl overflow-hidden elevation-1 border border-gray-200">
-        <div className="overflow-x-auto">
-          <table className="w-full">
+      <div className="bg-primary-foreground rounded-2xl elevation-1 overflow-hidden">
+        <div className="max-h-[70vh] overflow-auto">
+          {/* Tablet/Mobile: grid rows with View more */}
+          <div className="lg:hidden">
+            <div className="sticky top-0 z-20 grid grid-cols-5 gap-2 bg-muted/60 px-4 py-3 text-xs font-semibold text-muted-foreground border-b border-border">
+              <div>Item</div>
+              <div className="">Quantity</div>
+              <div>Unit</div>
+              <div>Status</div>
+              <div className="">View</div>
+            </div>
+
+            {loading ? (
+              <div className="px-4 py-12 text-center text-foreground">Loading…</div>
+            ) : ingredients.length === 0 ? (
+              <div className="px-4 py-12 text-center text-foreground">No ingredients found</div>
+            ) : (
+              ingredients.map((ingredient) => {
+                const isLow = ingredient.quantity <= ingredient.minThreshold
+                const isExpanded = expandedId === ingredient.id
+                const isEditing = editingId === ingredient.id
+
+                return (
+                  <div
+                    key={ingredient.id}
+                    className={`border-b last:border-b-0 border-border ${isLow ? "bg-red-50" : "bg-primary-foreground"}`}
+                  >
+                    <div className="grid grid-cols-5 items-center gap-2 px-4 py-3">
+                      <div className="truncate text-foreground">{ingredient.name}</div>
+                      <div className="text-foreground">{ingredient.quantity}</div>
+                      <div className="truncate text-foreground">{ingredient.unit}</div>
+                      <div>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                            isLow ? "bg-red-100 text-error" : "bg-green-100 text-green-700"
+                          }`}
+                        >
+                          {isLow ? "Low" : "OK"}
+                        </span>
+                      </div>
+                      <div className="flex justify-end">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setExpandedId((prev) => (prev === ingredient.id ? null : ingredient.id))}
+                        >
+                          {isExpanded ? "Hide" : "More"}
+                        </Button>
+                      </div>
+                    </div>
+
+                    {isExpanded ? (
+                      <div className="px-4 pb-4">
+                        <div className="grid grid-cols-1 gap-3 rounded-lg border border-border bg-background/40 p-3 text-sm">
+                          <div className="flex items-center justify-between gap-3">
+                            <span className="text-muted-foreground">Min threshold</span>
+                            <span className="text-foreground">
+                              {ingredient.minThreshold} {ingredient.unit}
+                            </span>
+                          </div>
+
+                          {isEditing ? (
+                            <div className="grid grid-cols-1 gap-2">
+                              <Input
+                                value={String(editForm.name ?? ingredient.name)}
+                                onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                                placeholder="Ingredient name"
+                              />
+                              <Input
+                                type="number"
+                                value={String(editForm.quantity ?? ingredient.quantity)}
+                                min={0}
+                                onChange={(e) => setEditForm({ ...editForm, quantity: Number(e.target.value || 0) })}
+                                placeholder="Quantity"
+                              />
+                              <Input
+                                type="number"
+                                value={String(editForm.minThreshold ?? ingredient.minThreshold)}
+                                min={0}
+                                onChange={(e) =>
+                                  setEditForm({ ...editForm, minThreshold: Number(e.target.value || 0) })
+                                }
+                                placeholder="Min threshold"
+                              />
+
+                              <div className="flex gap-2">
+                                <Button onClick={saveEdit} variant="primary" size="sm" className="flex-1">
+                                  <Save className="w-4 h-4" /> Save
+                                </Button>
+                                <Button
+                                  onClick={() => {
+                                    setEditingId(null)
+                                    setEditForm({})
+                                  }}
+                                  variant="outline"
+                                  size="sm"
+                                  className="flex-1"
+                                >
+                                  <X className="w-4 h-4" /> Cancel
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex gap-2">
+                              <Button
+                                onClick={() => {
+                                  setEditingId(ingredient.id)
+                                  setEditForm(ingredient)
+                                }}
+                                variant="outline"
+                                size="sm"
+                                className="flex-1"
+                              >
+                                <Edit2 className="w-4 h-4" /> Edit
+                              </Button>
+                              <Button
+                                onClick={() => deleteIng(ingredient.id)}
+                                variant="danger"
+                                size="sm"
+                                className="flex-1"
+                              >
+                                <Trash2 className="w-4 h-4" /> Delete
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ) : null}
+                  </div>
+                )
+              })
+            )}
+          </div>
+
+          {/* Desktop: full table */}
+          <table className="hidden lg:table w-full">
             <thead>
               <tr className=" border-gray-200 bg-gray-200">
                 <th className="sticky top-0 z-20  px-4 py-3 text-left text-sm font-semibold text-secondary border-b border-gray-200">Ingredient</th>
@@ -177,40 +315,44 @@ export default function InventoryView() {
                         <div className="flex justify-center gap-[70px]">
                           {editingId === ingredient.id ? (
                             <>
-                              <button
+                              <Button
                                 onClick={saveEdit}
-                                className="p-2 bg-tertiary text-white rounded-lg hover:bg-tertiary/90 shadow-sm transition"
+                                variant="primary"
+                                size="icon"
                                 title="Save"
                               >
                                 <Save className="w-4 h-4" />
-                              </button>
-                              <button
+                              </Button>
+                              <Button
                                 onClick={() => setEditingId(null)}
-                                className="p-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 shadow-sm transition"
+                                variant="outline"
+                                size="icon"
                                 title="Cancel"
                               >
                                 <X className="w-4 h-4" />
-                              </button>
+                              </Button>
                             </>
                           ) : (
                             <>
-                              <button
+                              <Button
                                 onClick={() => {
                                   setEditingId(ingredient.id)
                                   setEditForm(ingredient)
                                 }}
-                                className="px-3 py-1 bg-primary-foreground border rounded text-sm text-secondary hover:shadow-sm"
+                                variant="outline"
+                                size="icon"
                                 title="Edit"
                               >
                                 <Edit2 className="w-4 h-4" />
-                              </button>
-                              <button
+                              </Button>
+                              <Button
                                 onClick={() => deleteIng(ingredient.id)}
-                                className="px-3 py-1 bg-primary-foreground border rounded text-sm text-error hover:shadow-sm"
+                                variant="danger"
+                                size="icon"
                                 title="Delete"
                               >
                                 <Trash2 className="w-4 h-4" />
-                              </button>
+                              </Button>
                             </>
                           )}
                         </div>

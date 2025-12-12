@@ -4,7 +4,6 @@ import {
   LogOut,
   ListOrdered,
   UserRoundPen,
-  AlignStartVertical,
   X,
   View,
   Archive,
@@ -53,6 +52,7 @@ export default function RootLayout() {
     navigate({ to: "/" })
   }
 
+
   // primary color changed by you
   const primaryHex = "#266489" // <-- new primary
 
@@ -80,17 +80,17 @@ export default function RootLayout() {
         style={{ color }}
         className={`${base} ${activeExtras}`}
       >
-        <div className="flex items-center justify-center w-8 h-8">
+        <div className="hidden lg:flex items-center justify-center w-8 h-8">
           <Icon style={{ color: "currentColor" }} className="w-5 h-5" />
         </div>
 
         <span
           className="
-            ml-2 whitespace-nowrap
-            opacity-0 group-hover:opacity-100
-            max-w-0 group-hover:max-w-[200px]
-            transition-all duration-180 overflow-hidden
-            md:block
+            ml-2 whitespace-nowrap block
+            opacity-100 max-w-none
+            lg:opacity-0 lg:group-hover:opacity-100
+            lg:max-w-0 lg:group-hover:max-w-[200px]
+            lg:transition-all lg:duration-180 lg:overflow-hidden
           "
         >
           {children}
@@ -102,24 +102,23 @@ export default function RootLayout() {
   return (
     <div className="min-h-screen flex bg-[#f1f4f9]">
       {/* mobile header */}
-      <header className="w-full md:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-200 flex items-center justify-between px-4 py-2">
+      <header className="w-full lg:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-200 flex items-center justify-between px-4 py-2">
         <div className="flex items-center gap-2">
           <button aria-label="Open menu" onClick={() => setMobileOpen(true)} className="p-2 rounded-2xl hover:bg-gray-100">
-            <AlignStartVertical />
+            {/* Hamburger icon (3 bars) */}
+            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
           </button>
+          <img src={LogoUrl} className="w-5 h-5" alt="Serenity Logo" />
           <div className="font-bold text-lg">Serenity</div>
         </div>
-        <div className="flex items-center gap-2">
-          <button onClick={handleLogout} className="flex items-center gap-2 text-[#ba1a1a] px-2 py-1 rounded-2xl hover:bg-red-50">
-            <LogOut className="w-4 h-4" />
-            <span className="text-sm">Logout</span>
-          </button>
-        </div>
+        {/* No right-side dropdown/hamburger */}
       </header>
 
       {/* desktop sidebar - part of document flow so it PUSHES main content */}
       <aside
-        className="hidden md:flex sticky top-0 h-screen w-16 hover:w-[220px] group bg-white text-gray-800 border-r border-gray-200 transition-[width] duration-200 ease-in-out overflow-hidden"
+        className="hidden lg:flex sticky top-0 h-screen lg:w-16 lg:hover:w-[220px] group bg-white text-gray-800 border-r border-gray-200 transition-[width] duration-200 ease-in-out overflow-hidden"
         aria-label="Main navigation"
       >
         <div className="flex flex-col h-full w-full">
@@ -155,11 +154,11 @@ export default function RootLayout() {
 
       {/* mobile overlay & menu (unchanged) */}
       <div
-        className={`md:hidden fixed inset-0 z-50 transition-opacity ${isMobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        className={`lg:hidden fixed inset-0 z-50 transition-opacity ${isMobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
         aria-hidden={!isMobileOpen}
       >
         <div className="absolute inset-0 bg-black/50" onClick={() => setMobileOpen(false)} />
-        <div className="absolute left-0 top-0 bottom-0 w-[250px] bg-white border-r border-gray-200 shadow-lg p-4">
+        <div className="absolute left-0 top-0 bottom-0 w-sm bg-white border-r border-gray-200 shadow-lg p-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded flex items-center justify-center text-white font-bold">
@@ -191,8 +190,8 @@ export default function RootLayout() {
       </div>
 
       {/* main no longer needs marginLeft; it will be pushed by the sidebar's width */}
-      <main className="flex-1 min-h-screen transition-all duration-200 pt-14 md:pt-6" style={{ backgroundColor: "#f1f4f9" }}>
-        <div className="p-6 md:pt-6">
+      <main className="flex-1 min-h-screen transition-all duration-200 pt-14 lg:pt-6" style={{ backgroundColor: "#f1f4f9" }}>
+        <div className="p-6 lg:pt-6">
           <Outlet />
         </div>
       </main>

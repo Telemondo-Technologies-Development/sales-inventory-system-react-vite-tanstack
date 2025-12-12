@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { X, Trash2 } from "lucide-react"
 import { useForm } from "react-hook-form"
 import type { Order, OrderItem, PaymentRecord } from "../../database/order-helper/OrderDexieDB"
