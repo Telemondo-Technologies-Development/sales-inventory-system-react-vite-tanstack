@@ -23,6 +23,7 @@ export default function EmployeeView() {
 
   const [employees, setEmployees] = useState<Employee[]>([])
   const [filtered, setFiltered] = useState<Employee[]>([])
+  const [allowSetup, setAllowSetup] = useState(false)
   const [query, setQuery] = useState("")
   const [roleFilter, setRoleFilter] = useState<string>("all")
   const [taskFilter, setTaskFilter] = useState<string>("all")
@@ -30,20 +31,20 @@ export default function EmployeeView() {
   const [editId, setEditId] = useState<string | null>(null)
   const objectUrls = useRef<Record<string, string>>({})
 
-  // Guard: redirect if user not admin/manager
+  // Guard: redirect if user not authenticated, unless this is the initial setup (no employees yet)
   useEffect(() => {
-    if (!current || (current.role !== "admin" && current.role !== "manager")) {
-      // not allowed -> send to orders (employee) or login if not authenticated
-      if (!current || !current.id) router.navigate({ to: "/login" })
-      else router.navigate({ to: "/orders" })
+    if (allowSetup) return
+    if (!current || !current.id) {
+      router.navigate({ to: "/login" })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [current])
+  }, [current, allowSetup])
 
   async function load() {
     const all = await getAllEmployees()
     setEmployees(all)
     setFiltered(all)
+    setAllowSetup(all.length === 0)
 
     // cleanup & prepare object urls
     Object.values(objectUrls.current).forEach((u) => {
@@ -168,7 +169,7 @@ export default function EmployeeView() {
 
         <section aria-labelledby="employees-heading">
           <h2 id="employees-heading" className="sr-only">Employees</h2>
-          <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {filtered.map((emp) => {
               const photo = objectUrls.current[emp.id]
               return (
@@ -190,7 +191,7 @@ export default function EmployeeView() {
                     </div>
 
                     <div className="flex flex-col items-end">
-                      <span className="text-sm px-2 py-1 rounded-2xl bg-primary-foreground text-primary font-semibold">{emp.role}</span>
+                      <span className="text-sm px-2 py-1 rounded-2xl bg-primary-foreground text-primary font-semibold capitalize">{emp.role}</span>
                       <span className="text-xs text-foreground mt-2">{new Date(emp.createdAt).toLocaleDateString()}</span>
                     </div>
                   </header>

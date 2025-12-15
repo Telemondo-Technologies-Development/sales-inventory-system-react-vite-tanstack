@@ -8,7 +8,7 @@ import {
   View,
   Archive,
   DollarSign,
-  IdCardLanyard 
+  IdCardLanyard,
 } from "lucide-react"
 import LogoUrl from "/logo.webp"
 
@@ -20,7 +20,7 @@ export default function RootLayout() {
 
   // simple pathname watcher so active link styles update
   const [pathname, setPathname] = React.useState(
-    typeof window !== "undefined" ? window.location.pathname : "/"
+    typeof window !== "undefined" ? window.location.pathname : "/",
   )
   React.useEffect(() => {
     const onChange = () => setPathname(window.location.pathname)
@@ -52,7 +52,6 @@ export default function RootLayout() {
     navigate({ to: "/" })
   }
 
-
   // primary color changed by you
   const primaryHex = "#266489" // <-- new primary
 
@@ -69,8 +68,11 @@ export default function RootLayout() {
     const isActive = pathname === to || pathname.startsWith(to + "/")
     const color = isActive ? primaryHex : inactiveHex
 
-    const base = "group/nav relative flex items-center gap-3 w-full text-sm font-semibold rounded-2xl transition-colors duration-150"
-    const activeExtras = isActive ? "bg-[#eaf4f8] px-3 py-2 rounded-2xl shadow-sm" : "px-2 py-2"
+    const base =
+      "group/nav relative flex items-center gap-3 w-full text-sm font-semibold rounded-2xl transition-colors duration-150"
+    const activeExtras = isActive
+      ? "bg-[#eaf4f8] px-3 py-2 rounded-2xl shadow-sm"
+      : "px-2 py-2"
 
     return (
       <Link
@@ -104,10 +106,26 @@ export default function RootLayout() {
       {/* mobile header */}
       <header className="w-full lg:hidden fixed top-0 left-0 right-0 z-40 bg-white border-b border-gray-200 flex items-center justify-between px-4 py-2">
         <div className="flex items-center gap-2">
-          <button aria-label="Open menu" onClick={() => setMobileOpen(true)} className="p-2 rounded-2xl hover:bg-gray-100">
+          <button
+            aria-label="Open menu"
+            onClick={() => setMobileOpen(true)}
+            className="p-2 rounded-2xl hover:bg-gray-100"
+          >
             {/* Hamburger icon (3 bars) */}
-            <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-5 h-5">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            <svg
+              width="20"
+              height="20"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              className="w-5 h-5"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 6h16M4 12h16M4 18h16"
+              />
             </svg>
           </button>
           <img src={LogoUrl} className="w-5 h-5" alt="Serenity Logo" />
@@ -125,19 +143,33 @@ export default function RootLayout() {
           <div className="px-3 py-4 flex items-center justify-start">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-2xl flex items-center justify-center text-white font-bold">
-                <img src={LogoUrl}/>
+                <img src={LogoUrl} />
               </div>
-              <span className="ml-8 font-bold text-lg truncate text-primary">Serenity</span>
+              <span className="ml-8 font-bold text-lg truncate text-primary">
+                Serenity
+              </span>
             </div>
           </div>
 
           <nav className="mt-4 px-2 flex flex-col gap-2 ">
-            <NavLink to="/sales-view" Icon={UserRoundPen}>Sales</NavLink>
-            <NavLink to="/expenses-view" Icon={DollarSign}>Expenses</NavLink>
-            <NavLink to="/order-view" Icon={View}>Order View</NavLink>
-            <NavLink to="/table-orders" Icon={ListOrdered}>Table Orders</NavLink>
-            <NavLink to="/inventory-view" Icon={Archive}>Inventory View</NavLink>
-            <NavLink to="/employee-view" Icon={IdCardLanyard}>Employee</NavLink>
+            <NavLink to="/sales-view" Icon={UserRoundPen}>
+              Sales
+            </NavLink>
+            <NavLink to="/expenses-view" Icon={DollarSign}>
+              Expenses
+            </NavLink>
+            <NavLink to="/order-view" Icon={View}>
+              Order View
+            </NavLink>
+            <NavLink to="/table-orders" Icon={ListOrdered}>
+              Table Orders
+            </NavLink>
+            <NavLink to="/inventory-view" Icon={Archive}>
+              Inventory View
+            </NavLink>
+            <NavLink to="/employee-view" Icon={IdCardLanyard}>
+              Employee
+            </NavLink>
           </nav>
 
           <div className="mt-auto px-2 py-4">
@@ -146,42 +178,72 @@ export default function RootLayout() {
               className="w-full flex items-center justify-start gap-2 text-[#ba1a1a] bg-transparent hover:bg-red-50 rounded-lg transition-colors px-2 py-2"
             >
               <LogOut className="w-5 h-5 ml-2" />
-              <span className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150">Logout</span>
+              <span className="ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                Logout
+              </span>
             </button>
           </div>
         </div>
       </aside>
 
-      {/* mobile overlay & menu (unchanged) */}
+      {/* mobile overlay & menu */}
       <div
-        className={`lg:hidden fixed inset-0 z-50 transition-opacity ${isMobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        className={`lg:hidden fixed inset-0 z-50 transition-opacity ${
+          isMobileOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
+        }`}
         aria-hidden={!isMobileOpen}
       >
-        <div className="absolute inset-0 bg-black/50" onClick={() => setMobileOpen(false)} />
+        <div
+          className="absolute inset-0 bg-black/50"
+          onClick={() => setMobileOpen(false)}
+        />
         <div className="absolute left-0 top-0 bottom-0 w-sm bg-white border-r border-gray-200 shadow-lg p-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded flex items-center justify-center text-white font-bold">
-                <img src={LogoUrl}/>
+                <img src={LogoUrl} />
               </div>
               <div className="font-bold">Dashboard</div>
             </div>
-            <button onClick={() => setMobileOpen(false)} className="p-2 rounded hover:bg-gray-100">
+            <button
+              onClick={() => setMobileOpen(false)}
+              className="p-2 rounded hover:bg-gray-100"
+            >
               <X />
             </button>
           </div>
 
           <nav className="mt-4 px-2 flex flex-col gap-2 ">
-            <NavLink to="/employee-view" Icon={IdCardLanyard}>Employee</NavLink>
-            <NavLink to="/sales-view" Icon={UserRoundPen}>Sales</NavLink>
-            <NavLink to="/table-orders" Icon={ListOrdered}>Table Orders</NavLink>
-            <NavLink to="/order-view" Icon={View}>Order View</NavLink>
-            <NavLink to="/inventory-view" Icon={Archive}>Inventory View</NavLink>
-            <NavLink to="/expenses-view" Icon={DollarSign}>Expenses</NavLink>
+            <NavLink to="/employee-view" Icon={IdCardLanyard}>
+              Employee
+            </NavLink>
+            <NavLink to="/sales-view" Icon={UserRoundPen}>
+              Sales
+            </NavLink>
+            <NavLink to="/table-orders" Icon={ListOrdered}>
+              Table Orders
+            </NavLink>
+            <NavLink to="/order-view" Icon={View}>
+              Order View
+            </NavLink>
+            <NavLink to="/inventory-view" Icon={Archive}>
+              Inventory View
+            </NavLink>
+            <NavLink to="/expenses-view" Icon={DollarSign}>
+              Expenses
+            </NavLink>
           </nav>
 
           <div className="mt-auto pt-6">
-            <button onClick={() => { setMobileOpen(false); handleLogout() }} className="w-full flex items-center gap-2 text-[#ba1a1a] bg-transparent hover:bg-red-50 rounded-lg px-2 py-2">
+            <button
+              onClick={() => {
+                setMobileOpen(false)
+                handleLogout()
+              }}
+              className="w-full flex items-center gap-2 text-[#ba1a1a] bg-transparent hover:bg-red-50 rounded-lg px-2 py-2"
+            >
               <LogOut className="w-5 h-5" />
               <span className="ml-2">Logout</span>
             </button>
@@ -189,8 +251,10 @@ export default function RootLayout() {
         </div>
       </div>
 
-      {/* main no longer needs marginLeft; it will be pushed by the sidebar's width */}
-      <main className="flex-1 min-h-screen transition-all duration-200 pt-14 lg:pt-6" style={{ backgroundColor: "#f1f4f9" }}>
+      <main
+        className="flex-1 min-h-screen transition-all duration-200 pt-14 lg:pt-6"
+        style={{ backgroundColor: "#f1f4f9" }}
+      >
         <div className="p-6 lg:pt-6">
           <Outlet />
         </div>

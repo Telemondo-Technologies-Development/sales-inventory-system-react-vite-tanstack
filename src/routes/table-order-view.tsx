@@ -341,7 +341,7 @@ export default function TableOrderView() {
                     <span className="font-semibold text-card-foreground">₱{subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Tax (15%):</span>
+                    <span className="text-muted-foreground">Tax (12%):</span>
                     <span className="font-semibold text-card-foreground">₱{tax.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-lg font-bold pt-2 border-t border-border">

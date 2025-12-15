@@ -33,8 +33,11 @@ export default function LoginPage() {
   })
 
   const routeForRole = (role: string) => {
-    if (role === "admin") return "/sales-view"
-    if (role === "manager") return "/order-view"
+    const r = (role || "").toLowerCase()
+    if (r === "admin") return "/sales-view"
+    if (r === "manager") return "/order-view"
+    if (r === "employee") return "/employees"
+    // fallback
     return "/employees"
   }
 
@@ -68,11 +71,11 @@ export default function LoginPage() {
       }
       try {
         localStorage.setItem("currentUser", JSON.stringify(publicUser))
-      } catch {
+      } catch {}
 
-      }
-
-      router.navigate({ to: routeForRole(found.role) })
+      const target = routeForRole(found.role)
+      console.debug("login: role=", found.role, "-> redirect=", target)
+      router.navigate({ to: target })
     } catch (err) {
       console.error("Login lookup failed", err)
       setError("An unexpected error occurred. Try again.")
