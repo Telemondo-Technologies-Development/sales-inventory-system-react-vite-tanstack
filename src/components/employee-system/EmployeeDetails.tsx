@@ -381,19 +381,22 @@ export default function EmployeeModal({
             <div className="sm:col-span-2">
               <FormLabel>Tasks (job responsibilities)</FormLabel>
               <div className="flex flex-wrap gap-2 mt-2">
-                {ALL_TASKS.map((t) => {
-                  const selected = (form.getValues("tasks") || []).includes(t)
-                  return (
-                    <button
-                      key={t}
-                      type="button"
-                      onClick={() => toggleTask(t)}
-                      className={`px-3 py-1 rounded text-sm border ${selected ? "bg-[#266489] text-white" : "bg-white text-gray-700"}`}
-                    >
-                      {t}
-                    </button>
-                  )
-                })}
+                {(() => {
+                  const watchedTasks = form.watch("tasks") || [];
+                  return ALL_TASKS.map((t) => {
+                    const selected = watchedTasks.includes(t);
+                    return (
+                      <button
+                        key={t}
+                        type="button"
+                        onClick={() => toggleTask(t)}
+                        className={`px-3 py-1 rounded text-sm border transition-colors duration-200 ${selected ? "bg-[#266489] text-white" : "bg-white text-gray-700"}`}
+                      >
+                        {t}
+                      </button>
+                    );
+                  });
+                })()}
               </div>
             </div>
 
@@ -402,7 +405,7 @@ export default function EmployeeModal({
               <FormControl>
                 <Input type="file" accept="image/*" onChange={handlePhotoChange} />
               </FormControl>
-              <FormDescription>Upload a clear headshot (JPEG/PNG).</FormDescription>
+              <FormDescription>Upload a clear 1x1 photo (JPEG/PNG).</FormDescription>
               {photoPreview && (
                 <img src={photoPreview} alt="preview" className="mt-2 w-28 h-20 object-cover rounded" />
               )}
@@ -416,7 +419,7 @@ export default function EmployeeModal({
               </FormControl>
               <FormDescription>Optional. Accepted formats: PDF, DOC, DOCX.</FormDescription>
               {resumeName && (
-                <div className="mt-2 text-sm text-muted-foreground ">{resumeName}</div>
+                <div className="mt-2 text-sm text-muted-foreground  ">{resumeName}</div>
               )}
               <FormMessage />
             </FormItem>
