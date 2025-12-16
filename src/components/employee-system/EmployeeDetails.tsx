@@ -25,7 +25,7 @@ import {
   type EmployeeTask,
 } from "@/database/employee-helper/EmployeeDexieDB"
 
-const ALL_TASKS: EmployeeTask[] = ["cashier", "kitchen", "waiter", "runner", "bar"]
+const ALL_TASKS: EmployeeTask[] = ["cashier", "kitchen", "waiter", "runner", "bar", "inventory"]
 const ROLES: EmployeeRole[] = ["admin", "manager", "employee"]
 
 /* Zod schema */
@@ -40,7 +40,7 @@ const EmployeeSchema = z.object({
     message: "Enter a valid phone number",
   }),
   role: z.enum(["admin", "manager", "employee"]).default("employee"),
-  tasks: z.array(z.enum(["cashier", "kitchen", "waiter", "runner", "bar"])).default([]).optional(),
+  tasks: z.array(z.enum(["cashier", "kitchen", "waiter", "runner", "bar", "inventory"])).default([]).optional(),
 })
 
 type EmployeeFormValues = z.infer<typeof EmployeeSchema>

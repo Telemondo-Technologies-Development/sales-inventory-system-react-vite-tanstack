@@ -9,7 +9,7 @@ import path from 'path'
 export default defineConfig({
   plugins: [
     TanStackRouterVite(),
-    devtools(), 
+    devtools({ eventBusConfig: { port: 42070 } }), 
     viteReact(),
     tailwindcss()
   ],

@@ -1,6 +1,5 @@
-
-
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
+import { createFileRoute, useRouter } from "@tanstack/react-router"
 import { AlertTriangle, Edit2, Save, X, Trash2 } from "lucide-react"
 import { Button } from "../components/ui/button"
 import { Input } from "../components/ui/input"
@@ -11,9 +10,13 @@ import {
 } from "../database/inventory-helper/InventoryDexieDB"
 
 import type { Ingredient } from "../database/inventory-helper/InventoryDexieDB"
+import { getCurrentUser } from "@/lib/auth"
 
+export function InventoryView() {
+  const router = useRouter()
+  const current = useMemo(() => getCurrentUser(), [])
+  const serverName = current?.name || current?.username || "Unknown"
 
-export default function InventoryView() {
   const [ingredients, setIngredients] = useState<Ingredient[]>([])
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editForm, setEditForm] = useState<Partial<Ingredient>>({})
@@ -75,13 +78,31 @@ export default function InventoryView() {
     }
   }
 
+  const handleLogout = () => {
+    try {
+      localStorage.removeItem("currentUser")
+    } catch {}
+    router.navigate({ to: "/login" })
+  }
+
   return (
     <div className="p-4 sm:p-6">
       <div className="mb-4 rounded-2xl bg-primary-foreground p-4 elevation-1">
         <header className="flex flex-col gap-2">
-          <div className="w-full">
-            <h1 className="text-2xl font-medium text-primary whitespace-normal wrap-break-word">Inventory Management</h1>
-            <p className="text-sm text-foreground">Overview of restaurant inventory and supplies</p>
+          <div className="flex flex-col items-center justify-center gap-2 w-full sm:flex-row sm:justify-between sm:items-center">
+            <div className="w-full text-center sm:text-left">
+              <h1 className="text-2xl font-medium text-primary whitespace-normal wrap-break-word">Inventory Management</h1>
+              <p className="text-sm text-foreground">Overview of restaurant inventory and supplies</p>
+            </div>
+
+            <div className="w-full flex flex-col items-center gap-2 sm:flex-row sm:gap-6 sm:text-sm sm:justify-end ">
+              <p className="text-sm text-foreground">
+                Stocktaker: <span className="font-semibold text-primary">{serverName}</span>
+              </p>
+              <Button variant="danger" onClick={handleLogout}>
+                Logout
+              </Button>
+            </div>
           </div>
         </header>
       </div>
@@ -115,7 +136,7 @@ export default function InventoryView() {
               <div className="">Quantity</div>
               <div>Unit</div>
               <div>Status</div>
-              <div className="">View</div>
+              <div className="mx-auto">View</div>
             </div>
 
             {loading ? (
@@ -146,7 +167,7 @@ export default function InventoryView() {
                           {isLow ? "Low" : "OK"}
                         </span>
                       </div>
-                      <div className="flex justify-end">
+                      <div className="flex justify-center">
                         <Button
                           variant="outline"
                           size="sm"
@@ -368,3 +389,9 @@ export default function InventoryView() {
     </div>
   )
 }
+
+export const Route = createFileRoute("/inventory")({
+  component: InventoryView,
+})
+
+export default InventoryView

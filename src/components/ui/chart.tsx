@@ -36,7 +36,6 @@ export function ChartContent({ className = "", children, style, ...props }: Reac
 export function LineChart({ data, height = 300 }: { data: { date: string; total: number }[]; height?: number }) {
   const padding = 24
   const w = 800
-  const labelHeight = 28
   const h = height
   const values = data.map((d) => d.total)
   const min = Math.min(...values, 0)

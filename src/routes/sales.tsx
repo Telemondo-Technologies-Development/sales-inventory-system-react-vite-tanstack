@@ -1,5 +1,4 @@
-
-
+import { createFileRoute } from "@tanstack/react-router"
 import { useEffect, useMemo, useState } from "react"
 import { getExpenses } from "../database/expenses-helper/ExpensesDexieDB"
 import { getOrders } from "../database/order-helper/OrderDexieDB"
@@ -8,8 +7,6 @@ import {
   SalesBarChart,
   TopItemsPie,
 } from "../components/sales-system/SalesDetails"
-
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 import type { Order } from "../database/order-helper/OrderDexieDB"
 import type { Expense } from "../database/expenses-helper/ExpensesDexieDB" 
@@ -20,7 +17,7 @@ import type { Expense } from "../database/expenses-helper/ExpensesDexieDB"
 export default function SalesView() {
   const [orders, setOrders] = useState<Order[]>([])
   const [expenses, setExpenses] = useState<Expense[]>([])
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc")
+  const sortOrder: "asc" | "desc" = "asc"
   const [dateFrom, setDateFrom] = useState<string>("")
   const [dateTo, setDateTo] = useState<string>("")
 
@@ -108,10 +105,10 @@ export default function SalesView() {
 
         <div className="mt-3 lg:mt-0 flex flex-col gap-2 lg:flex-row lg:items-center h-13 ">
           <div className="flex gap-2 items-center ">
-            <label className="text-xs text-muted-foreground">From</label>
-            <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="border rounded px-2 py-1 text-xs" />
-            <label className="text-xs text-muted-foreground">To</label>
-            <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="border rounded px-2 py-1 text-xs" />
+            <label className="text-md text-muted-foreground">From</label>
+            <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="elevation-1 rounded-2xl px-2 py-1 text-sm" />
+            <label className="text-md text-muted-foreground">To</label>
+            <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="elevation-1 rounded-2xl px-2 py-1 text-sm" />
           </div>
         </div>
       </header>
@@ -182,3 +179,7 @@ export default function SalesView() {
     </div>
   )
 }
+
+export const Route = createFileRoute("/sales")({
+  component: SalesView,
+})

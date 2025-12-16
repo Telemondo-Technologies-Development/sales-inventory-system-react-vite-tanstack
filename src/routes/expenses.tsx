@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react"
+import { createFileRoute } from "@tanstack/react-router"
 import { Plus, Edit2, Trash2, Search } from "lucide-react"
-import { getExpenses, deleteExpense } from "../database/expenses-helper/ExpensesDexieDB"
-import { getIngredients } from "../database/inventory-helper/InventoryDexieDB"
-import ExpenseFormModal from "../components/expenses-system/ExpensesDetails"
-import type { Expense } from "../database/expenses-helper/ExpensesDexieDB"
+import { getExpenses, deleteExpense } from "@/database/expenses-helper/ExpensesDexieDB"
+import { getIngredients } from "@/database/inventory-helper/InventoryDexieDB"
+import ExpenseFormModal from "@/components/expenses-system/ExpensesDetails"
+import type { Expense } from "@/database/expenses-helper/ExpensesDexieDB"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -316,3 +317,7 @@ export default function ExpensesView() {
     </div>
   )
 }
+
+export const Route = createFileRoute("/expenses")({
+  component: ExpensesView,
+})

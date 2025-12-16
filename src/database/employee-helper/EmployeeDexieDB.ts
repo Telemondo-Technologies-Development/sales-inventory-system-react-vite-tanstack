@@ -1,7 +1,7 @@
 import Dexie from "dexie"
 
 export type EmployeeRole = "admin" | "manager" | "employee"
-export type EmployeeTask = "cashier" | "kitchen" | "waiter" | "runner" | "bar"
+export type EmployeeTask = "cashier" | "kitchen" | "waiter" | "runner" | "bar" | "inventory"
 
 export interface Employee {
   id: string

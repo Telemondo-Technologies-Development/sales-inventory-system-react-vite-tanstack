@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react"
-import { useRouter } from "@tanstack/react-router"
+import { createFileRoute, useRouter } from "@tanstack/react-router"
 import { Plus, Minus, Send, CheckCircle2 } from "lucide-react"
 import { z } from "zod"
 import { useForm } from "react-hook-form"
@@ -41,7 +41,7 @@ type MenuItemForUI = {
   imageUrl?: string | undefined
 }
 
-export default function TableOrderView() {
+export function TableOrderView() {
   const router = useRouter()
   const current = useMemo(() => getCurrentUser(), [])
   const serverName = current?.name || current?.username || "Unknown"
@@ -58,7 +58,7 @@ export default function TableOrderView() {
     try {
       localStorage.removeItem("currentUser")
     } catch {}
-    router.navigate({ to: "/" })
+    router.navigate({ to: "/login" })
   }
 
   const form = useForm<OrderFormValues>({
@@ -201,7 +201,7 @@ export default function TableOrderView() {
               <h1 className="text-3xl font-medium text-primary">Menu</h1>
               <p className="text-sm text-foreground">Overview of dishes and pricing</p>
             </div>
-            <div className="flex flex-col items-center gap-2 sm:flex-row sm:gap-6 sm:text-sm sm:justify-end">
+            <div className="flex flex-col items-center gap-2 sm:flex-row sm:gap-6 sm:text-sm sm:justify-end ">
               <p className="text-sm text-foreground">Server: <span className="font-semibold text-primary">{serverName}</span></p>
               <Button variant="danger" onClick={handleLogout}>
                 Logout
@@ -401,3 +401,7 @@ export default function TableOrderView() {
     </div>
   )
 }
+
+export const Route = createFileRoute("/table-order")({
+  component: TableOrderView,
+})

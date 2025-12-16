@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react"
+import { createFileRoute } from "@tanstack/react-router"
 import { useRouter } from "@tanstack/react-router"
 import { Trash2, Edit2, Search } from "lucide-react"
 import { getCurrentUser } from "@/lib/auth"
@@ -99,7 +100,7 @@ export default function EmployeeView() {
         <div className="mb-4 rounded-2xl bg-primary-foreground p-4 elevation-1">
           <header className="flex flex-col gap-4 lg:flex-row lg:items-center">
             <div className="w-full lg:w-[570px] ">
-              <h1 className="text-3xl font-medium text-primary whitespace-normal wrap-break-word">Employees Management</h1>
+              <h1 className="text-2xl font-medium text-primary whitespace-normal wrap-break-word">Employees Management</h1>
               <p className="text-sm text-foreground">Manage staff accounts & roles</p>
             </div>
 
@@ -258,3 +259,7 @@ export default function EmployeeView() {
     </div>
   )
 }
+
+export const Route = createFileRoute("/employee")({
+  component: EmployeeView,
+})

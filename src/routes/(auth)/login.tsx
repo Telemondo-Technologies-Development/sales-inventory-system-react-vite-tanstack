@@ -1,3 +1,4 @@
+import { createFileRoute } from "@tanstack/react-router"
 import { useState } from "react"
 import { useRouter } from "@tanstack/react-router"
 import { AlertCircle } from "lucide-react"
@@ -5,6 +6,7 @@ import { z } from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { findEmployeeByUsernameOrEmail } from "@/database/employee-helper/EmployeeDexieDB"
+import type { EmployeeTask } from "@/database/employee-helper/EmployeeDexieDB"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -32,13 +34,26 @@ export default function LoginPage() {
     mode: "onSubmit",
   })
 
-  const routeForRole = (role: string) => {
+  const routeForAccess = (
+    role: string,
+    tasks: EmployeeTask[] | undefined,
+  ): "/sales" | "/order" | "/inventory" | "/table-order" | "/login" => {
     const r = (role || "").toLowerCase()
-    if (r === "admin") return "/sales-view"
-    if (r === "manager") return "/order-view"
-    if (r === "employee") return "/employees"
-    // fallback
-    return "/employees"
+    if (r === "admin") return "/sales"
+
+    const t = (tasks ?? []).map((x) => String(x).toLowerCase())
+    if (t.includes("waiter")) return "/table-order"
+    if (t.includes("cashier")) return "/order"
+    if (
+      t.includes("kitchen") ||
+      t.includes("runner") ||
+      t.includes("bar") ||
+      t.includes("inventory")
+    )
+      return "/inventory"
+
+    // safe fallback
+    return "/login"
   }
 
   const handleLogin = async (values: LoginFormValues) => {
@@ -68,12 +83,13 @@ export default function LoginPage() {
         username: found.username ?? found.email ?? found.id,
         name: found.name,
         role: found.role,
+        tasks: found.tasks ?? [],
       }
       try {
         localStorage.setItem("currentUser", JSON.stringify(publicUser))
       } catch {}
 
-      const target = routeForRole(found.role)
+      const target = routeForAccess(found.role, found.tasks)
       console.debug("login: role=", found.role, "-> redirect=", target)
       router.navigate({ to: target })
     } catch (err) {
@@ -142,3 +158,7 @@ export default function LoginPage() {
     </section>
   )
 }
+
+export const Route = createFileRoute("/(auth)/login")({
+  component: LoginPage,
+})
