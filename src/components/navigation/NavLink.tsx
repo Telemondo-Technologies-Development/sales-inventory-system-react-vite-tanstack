@@ -7,10 +7,9 @@ type NavLinkProps = {
   children: React.ReactNode
   Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
   onClick?: () => void
-  collapsed?: boolean
 }
 
-export default function NavLink({ to, children, Icon, onClick, collapsed = false }: NavLinkProps) {
+export default function NavLink({ to, children, Icon, onClick }: NavLinkProps) {
   const [pathname, setPathname] = React.useState(
     typeof window !== "undefined" ? window.location.pathname : "/",
   )

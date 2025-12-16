@@ -95,6 +95,15 @@ export default function MobileHeader() {
                 >
                   Sales
                 </Link>
+                <Link
+                  to={"/table-order" as any}
+                  className="px-3 py-2 rounded-xl text-sm font-medium hover:bg-slate-100"
+                  onClick={() => setOpen(false)}
+                >
+                  Table Order
+                </Link>
+
+
 
                 <button
                   type="button"

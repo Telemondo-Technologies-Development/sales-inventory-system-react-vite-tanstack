@@ -271,7 +271,7 @@ export default function ExpensesView() {
                     <td className="px-4 py-4 text-foreground hidden md:table-cell">{e.supplier ?? "-"}</td>
                     <td className="px-4 py-4 text-foreground truncate max-w-[280px] hidden lg:table-cell">{e.notes ?? "-"}</td>
                     <td className="px-4 py-4 text-center">
-                      <div className="inline-flex gap-2">
+                      <div className="inline-flex gap-6">
                         <Button
                           onClick={() => {
                             setEditing(e)

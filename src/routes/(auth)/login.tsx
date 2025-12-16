@@ -61,36 +61,52 @@ export default function LoginPage() {
 
     setLoading(true)
     try {
-      const found = await findEmployeeByUsernameOrEmail(values.identifier.trim())
+      let found = await findEmployeeByUsernameOrEmail(values.identifier.trim())
+
+      // If no employee exists in the client DB (fresh deploy), allow a demo fallback
+      // so cloud preview / Pages can sign in. Credentials: demo / demo
       if (!found) {
-        setError("No account found for that username/email. Ask an admin to register you.")
-        return
+        if (values.identifier.trim() === "demo" && values.password === "demo") {
+          // create an in-memory demo user (not persisted)
+          found = {
+            id: "demo-user",
+            username: "demo",
+            password: "demo",
+            name: "Demo User",
+            role: "admin",
+            tasks: ["cashier"],
+            createdAt: new Date().toISOString(),
+          } as any
+        } else {
+          setError("No account found for that username/email. Ask an admin to register you.")
+          return
+        }
       }
 
-      if (!found.password) {
+      if (!found!.password) {
         setError("This account does not have a password set. Ask an admin to set credentials.")
         return
       }
 
-      if (found.password !== values.password) {
+      if (found!.password !== values.password) {
         setError("Invalid credentials.")
         return
       }
 
  
       const publicUser = {
-        id: found.id,
-        username: found.username ?? found.email ?? found.id,
-        name: found.name,
-        role: found.role,
-        tasks: found.tasks ?? [],
+        id: found!.id,
+        username: found!.username ?? found!.email ?? found!.id,
+        name: found!.name,
+        role: found!.role,
+        tasks: found!.tasks ?? [],
       }
       try {
         localStorage.setItem("currentUser", JSON.stringify(publicUser))
       } catch {}
 
-      const target = routeForAccess(found.role, found.tasks)
-      console.debug("login: role=", found.role, "-> redirect=", target)
+      const target = routeForAccess(found!.role, found!.tasks)
+      console.debug("login: role=", found!.role, "-> redirect=", target)
       router.navigate({ to: target })
     } catch (err) {
       console.error("Login lookup failed", err)
