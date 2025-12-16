@@ -1,33 +1,42 @@
-  # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
-  name: Cloudflare Pages Deploy
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Cloudflare Pages Deploy
 
-  on:
-    push:
-      # Only deploy when pushing to the main branch
-      branches:
-        - main
-  jobs:
-    deploy:
-      permissions:
-        actions: read # Only required for private GitHub Repo
-        contents: read
-        deployments: write
-        pull-requests: write
-      runs-on: ubuntu-latest
-      timeout-minutes: 5
-      steps:
-        - name: "Checkout Github Action"
-          uses: actions/checkout@v4
-        - name: "Deploy to Cloudflare Pages"
-          uses: andykenward/github-actions-cloudflare-pages@v3.0.0
-          with:
-            # Use your consolidated secret created as CLOUDFLARE_SERENITY_MANAGEMENT
-            # (This should contain the API token string. If you store a JSON/blob, update accordingly.)
-            cloudflare-api-token: ${{ secrets.CLOUDFLARE_SERENITY_MANAGEMENT }}
-            # Account / project identifiers can come from repository variables or secrets.
-            # If you prefer secrets, add CLOUDFLARE_SERENITY_MANAGEMENT_ACCOUNT_ID and CLOUDFLARE_SERENITY_MANAGEMENT_PROJECT
-            cloudflare-account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-            cloudflare-project-name: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
-            directory: dist
-            github-token: ${{ secrets.GITHUB_TOKEN }}
-            github-environment: ${{ (github.ref == 'refs/heads/main' && 'production') || 'preview' }}
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    permissions:
+      actions: read 
+      contents: read
+      deployments: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout Github Action
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to Cloudflare Pages
+        uses: andykenward/github-actions-cloudflare-pages@v3.0.0
+        with:
+          cloudflare-api-token: ${{ secrets.CLOUDFLARE_SERENITY_MANAGEMENT }}
+          cloudflare-account-id: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          cloudflare-project-name: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
+          directory: dist
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-environment: ${{ (github.ref == 'refs/heads/main' && 'production') || 'preview' }}
