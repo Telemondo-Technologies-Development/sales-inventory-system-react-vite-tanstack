@@ -16,7 +16,7 @@ export default function DesktopSidebar() {
   }
 
   return (
-    <aside className="hidden lg:block w-[200px] elevation-1 h-screen sticky top-0 left-0 bg-white">
+    <aside className="hidden lg:block w-[200px] elevation-1 h-screen sticky top-0 left-0 bg-primary-foreground">
       <div className="p-4 flex flex-col h-full justify-between">
         <div>
           <div className="flex items-center gap-2 mb-4 px-2">

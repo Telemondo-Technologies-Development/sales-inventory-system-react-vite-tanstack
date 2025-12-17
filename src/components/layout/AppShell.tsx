@@ -5,7 +5,7 @@ import MobileHeader from "../navigation/MobileHeader"
 
 export default function AppShell() {
   return (
-    <div className="h-screen w-screen bg-slate-50 text-slate-900">
+    <div className="h-screen w-screen bg-background text-foreground">
       <div className="flex h-full">
         <DesktopSidebar />
 
