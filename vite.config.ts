@@ -15,7 +15,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       injectRegister: null,
       manifestFilename: 'manifest.json',
-      includeAssets: ['favicon.ico', 'logo.svg', 'logo.webp', 'logo192.png', 'logo512.png'],
+      includeAssets: ['logo.svg', 'logo.webp'],
       manifest: {
         name: 'Restaurant Business Management',
         short_name: 'Management',
@@ -26,24 +26,16 @@ export default defineConfig({
         background_color: '#ffffff',
         icons: [
           {
-            src: '/logo192.png',
-            sizes: '192x192',
-            type: 'image/png',
-          },
-          {
-            src: '/logo512.png',
-            sizes: '512x512',
-            type: 'image/png',
-          },
-          {
             src: '/logo.webp',
             sizes: '512x512',
             type: 'image/webp',
+            purpose: 'any',
           },
           {
             src: '/logo.svg',
             sizes: 'any',
             type: 'image/svg+xml',
+            purpose: 'any',
           },
         ],
       },
