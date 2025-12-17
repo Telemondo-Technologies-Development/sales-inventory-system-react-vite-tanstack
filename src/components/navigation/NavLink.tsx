@@ -1,40 +1,16 @@
-import React from "react"
-import { Link } from "@tanstack/react-router"
+import type { ComponentType, ReactNode, SVGProps } from "react"
+import { Link, useRouterState } from "@tanstack/react-router"
 import { Button } from "../ui/button"
 
 type NavLinkProps = {
   to: string
-  children: React.ReactNode
-  Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>
+  children: ReactNode
+  Icon: ComponentType<SVGProps<SVGSVGElement>>
   onClick?: () => void
 }
 
 export default function NavLink({ to, children, Icon, onClick }: NavLinkProps) {
-  const [pathname, setPathname] = React.useState(
-    typeof window !== "undefined" ? window.location.pathname : "/",
-  )
-
-  React.useEffect(() => {
-    const onChange = () => setPathname(window.location.pathname)
-    window.addEventListener("popstate", onChange)
-    const origPush = history.pushState
-    const origReplace = history.replaceState
-    history.pushState = function () {
-      // @ts-ignore
-      origPush.apply(this, arguments)
-      window.dispatchEvent(new Event("popstate"))
-    }
-    history.replaceState = function () {
-      // @ts-ignore
-      origReplace.apply(this, arguments)
-      window.dispatchEvent(new Event("popstate"))
-    }
-    return () => {
-      window.removeEventListener("popstate", onChange)
-      history.pushState = origPush
-      history.replaceState = origReplace
-    }
-  }, [])
+  const pathname = useRouterState({ select: (s) => s.location.pathname })
 
   const isActive = pathname === to || pathname.startsWith(to + "/")
   const primaryHex = "#266489"
