@@ -13,13 +13,13 @@ Tailwind CSS - Shadcn UI - Lucide Icons
   - Track product quantities, monitor stock levels, and manage item updates to ensure accurate and up-to-date inventory records.
 * Sales Management
   - Record sales transactions, calculate totals, and maintain a clear history of daily and overall sales performance.
-*Employee Management
+* Employee Management
   - Manage employee records, assign roles, and control access levels within the system.
-*Expenses Management
+* Expenses Management
   - Log and monitor business expenses to help track costs and improve financial decision-making.
-*Restaurant Menu & Order Management
+* Restaurant Menu & Order Management
   - Manage menu items, process customer orders, and handle order workflows efficiently for restaurant operations.
-*Role-Based Login System
+* Role-Based Login System
   - Secure authentication system that grants users access based on their assigned roles (e.g., admin, cashier, staff).
 
 ## Installation Guide
