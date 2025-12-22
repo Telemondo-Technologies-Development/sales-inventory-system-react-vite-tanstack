@@ -8,6 +8,14 @@ import {
   type MenuItem,
 } from "@/database/menu-helper/MenuDexieDB"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select"
 
 /**
  * UpdateMenuModal
@@ -217,7 +225,7 @@ export default function UpdateMenuModal({
       if (url) return <img src={url} alt={item.name} className="w-24 h-16 object-cover rounded" />
     }
 
-    return <div className="text-sm text-3xl text-foreground">No image</div>
+    return <div className="text-sm text-foreground">No image</div>
   }
 
   if (!open) return null
@@ -277,14 +285,15 @@ export default function UpdateMenuModal({
                                   type="file"
                                   accept="image/*"
                                   onChange={(e) => handleFileChange(e, item.id)}
+                                  className="block"
                                 />
                                 <div className="mt-2 text-xs text-foreground">Replace image</div>
                                 <div className="mt-1">
-                                  <button
+                                  <Button
                                     type="button"
-                                    className="px-2 py-1 text-xs text-error rounded-2xl hover:bg-red-50"
+                                    variant="danger"
+                                    size="xs"
                                     onClick={() => {
-                                      // mark as removed
                                       if (previewUrls.current[item.id]) {
                                         try {
                                           URL.revokeObjectURL(previewUrls.current[item.id])
@@ -295,7 +304,7 @@ export default function UpdateMenuModal({
                                     }}
                                   >
                                     Remove
-                                  </button>
+                                  </Button>
                                 </div>
                               </div>
                             )}
@@ -304,11 +313,10 @@ export default function UpdateMenuModal({
 
                         <td className="px-4 py-4 text-sm">
                           {isEditing ? (
-                            <input
-                              type="text"
+                            <Input
                               value={String(editForm?.name ?? item.name)}
                               onChange={(e) => setEditForm((p) => ({ ...(p ?? {}), name: e.target.value }))}
-                              className="px-2 py-1 bg-gray-50 border border-gray-200 rounded-2xl w-full text-sm"
+                              className="rounded-2xl"
                             />
                           ) : (
                             <div className="text-foreground">{item.name}</div>
@@ -317,14 +325,14 @@ export default function UpdateMenuModal({
 
                         <td className="px-4 py-4 text-sm">
                           {isEditing ? (
-                            <input
+                            <Input
                               type="number"
                               min={0}
                               value={String(editForm?.price ?? item.price)}
                               onChange={(e) =>
                                 setEditForm((p) => ({ ...(p ?? {}), price: Number(e.target.value || 0) }))
                               }
-                              className="px-2 py-1 bg-gray-50 border border-gray-200 rounded w-24 text-sm"
+                              className="w-24"
                             />
                           ) : (
                             <div className="text-foreground">₱{item.price.toFixed(2)}</div>
@@ -333,59 +341,62 @@ export default function UpdateMenuModal({
 
                         <td className="px-4 py-4 text-sm">
                           {isEditing ? (
-                            <select
+                            <Select
                               value={String(editForm?.category ?? item.category)}
-                              onChange={(e) => setEditForm((p) => ({ ...(p ?? {}), category: e.target.value }))}
-                              className="px-2 py-1 bg-gray-50 border border-gray-200 rounded text-sm"
+                              onValueChange={(v) => setEditForm((p) => ({ ...(p ?? {}), category: v }))}
                             >
-                              <option>Main</option>
-                              <option>Sides</option>
-                              <option>Drinks</option>
-                              <option>Desserts</option>
-                            </select>
+                              <SelectTrigger size="sm" className="rounded">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Main">Main</SelectItem>
+                                <SelectItem value="Sides">Sides</SelectItem>
+                                <SelectItem value="Drinks">Drinks</SelectItem>
+                                <SelectItem value="Desserts">Desserts</SelectItem>
+                              </SelectContent>
+                            </Select>
                           ) : (
                             <div className="text-foreground">{item.category}</div>
                           )}
                         </td>
 
                         <td className="px-4 py-4 text-sm text-center">
-                          <div className="flex items-center justify-center gap-3">
+                          <div className="flex items-center justify-center gap-6">
                             {isEditing ? (
                               <>
-                                <button
+                                <Button
                                   onClick={() => handleSave(item.id)}
-                                  className="p-2 bg-tertiary text-white rounded-lg hover:bg-tertiary-dark shadow-sm transition"
                                   title="Save"
+                                  size="icon"
+                                  variant="outline"
                                   disabled={savingId === item.id}
                                 >
-                                  <Save className="w-4 h-4" />
-                                </button>
-                                <button
+                                  <Save />
+                                </Button>
+                                <Button
                                   onClick={cancelEdit}
-                                  className="p-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 shadow-sm transition"
                                   title="Cancel"
+                                  size="icon"
+                                  variant="outline"
                                   disabled={savingId === item.id}
                                 >
-                                  <X className="w-4 h-4" />
-                                </button>
+                                  <X />
+                                </Button>
                               </>
                             ) : (
                               <>
-                                <button
-                                  onClick={() => startEdit(item)}
-                                  className="px-3 py-1 bg-primary-foreground border rounded text-sm text-primary hover:shadow-sm"
-                                  title="Edit"
-                                >
-                                  <Edit2 className="w-4 h-4" />
-                                </button>
-                                <button
+                                <Button onClick={() => startEdit(item)} title="Edit" size="sm" variant="outline">
+                                  <Edit2 />
+                                </Button>
+                                <Button
                                   onClick={() => handleDelete(item.id)}
-                                  className="px-3 py-1 bg-primary-foreground border rounded text-sm text-error hover:shadow-sm"
                                   title="Delete"
+                                  size="sm"
+                                  variant="danger"
                                   disabled={deletingId === item.id}
                                 >
-                                  <Trash2 className="w-4 h-4" />
-                                </button>
+                                  <Trash2 />
+                                </Button>
                               </>
                             )}
                           </div>

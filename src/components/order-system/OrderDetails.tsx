@@ -1,5 +1,3 @@
-"use client"
-
 import { useEffect, useRef, useState } from "react"
 import { X, Trash2 } from "lucide-react"
 import { useForm } from "react-hook-form"
@@ -39,11 +37,12 @@ export default function OrderDetails({
 }: Props) {
   const cloneOrder = (o: Order) => {
     try {
-      // @ts-ignore
-      return typeof structuredClone === "function" ? structuredClone(o) : JSON.parse(JSON.stringify(o))
-    } catch {
-      return JSON.parse(JSON.stringify(o))
-    }
+      if (typeof globalThis.structuredClone === "function") {
+        return globalThis.structuredClone(o)
+      }
+    } catch {}
+
+    return JSON.parse(JSON.stringify(o)) as Order
   }
 
   const [draft, setDraft] = useState<Order>(() => cloneOrder(order))

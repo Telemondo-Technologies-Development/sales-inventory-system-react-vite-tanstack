@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react"
+import { createFileRoute } from "@tanstack/react-router"
 import { Plus, Edit2, Trash2, Search } from "lucide-react"
-import { getExpenses, deleteExpense } from "../database/expenses-helper/ExpensesDexieDB"
-import { getIngredients } from "../database/inventory-helper/InventoryDexieDB"
-import ExpenseFormModal from "../components/expenses-system/ExpensesDetails"
-import type { Expense } from "../database/expenses-helper/ExpensesDexieDB"
+import { getExpenses, deleteExpense } from "@/database/expenses-helper/ExpensesDexieDB"
+import { getIngredients } from "@/database/inventory-helper/InventoryDexieDB"
+import ExpenseFormModal from "@/components/expenses-system/ExpensesDetails"
+import type { Expense } from "@/database/expenses-helper/ExpensesDexieDB"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -270,7 +271,7 @@ export default function ExpensesView() {
                     <td className="px-4 py-4 text-foreground hidden md:table-cell">{e.supplier ?? "-"}</td>
                     <td className="px-4 py-4 text-foreground truncate max-w-[280px] hidden lg:table-cell">{e.notes ?? "-"}</td>
                     <td className="px-4 py-4 text-center">
-                      <div className="inline-flex gap-2">
+                      <div className="inline-flex gap-6">
                         <Button
                           onClick={() => {
                             setEditing(e)
@@ -316,3 +317,7 @@ export default function ExpensesView() {
     </div>
   )
 }
+
+export const Route = createFileRoute("/expenses")({
+  component: ExpensesView,
+})

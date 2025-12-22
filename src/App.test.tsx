@@ -4,8 +4,9 @@ import App from "./App"
 import "./styles.css"
 
 describe("App", () => {
-  test("renders", () => {
+  test("renders login page", async () => {
     render(<App />)
-    expect(screen.getByText("Learn React")).toBeDefined()
+    // The app shows the login page for the root route
+    expect(await screen.findByText("Serenity Restaurant Management")).toBeDefined()
   })
 })

@@ -1,5 +1,4 @@
-
-
+import { createFileRoute } from "@tanstack/react-router"
 import { useEffect, useMemo, useState } from "react"
 import { getExpenses } from "../database/expenses-helper/ExpensesDexieDB"
 import { getOrders } from "../database/order-helper/OrderDexieDB"
@@ -18,6 +17,9 @@ import type { Expense } from "../database/expenses-helper/ExpensesDexieDB"
 export default function SalesView() {
   const [orders, setOrders] = useState<Order[]>([])
   const [expenses, setExpenses] = useState<Expense[]>([])
+  const sortOrder: "asc" | "desc" = "asc"
+  const [dateFrom, setDateFrom] = useState<string>("")
+  const [dateTo, setDateTo] = useState<string>("")
 
   useEffect(() => {
     let mounted = true
@@ -36,9 +38,19 @@ export default function SalesView() {
     }
   }, [])
 
+  // Filter orders by date range
+  const filteredOrders = useMemo(() => {
+    return orders.filter((o) => {
+      const d = new Date(o.createdAt)
+      if (dateFrom && d < new Date(dateFrom)) return false
+      if (dateTo && d > new Date(dateTo)) return false
+      return true
+    })
+  }, [orders, dateFrom, dateTo])
+
   // KPIs
-  const totalRevenue = useMemo(() => orders.reduce((s, o) => s + (Number(o.total) || 0), 0), [orders])
-  const totalOrders = orders.length
+  const totalRevenue = useMemo(() => filteredOrders.reduce((s, o) => s + (Number(o.total) || 0), 0), [filteredOrders])
+  const totalOrders = filteredOrders.length
   const avgOrderValue = totalOrders ? totalRevenue / totalOrders : 0
   const totalExpenses = useMemo(() => expenses.reduce((s, e) => s + (Number(e.cost) || 0), 0), [expenses])
   const profit = totalRevenue - totalExpenses
@@ -46,28 +58,28 @@ export default function SalesView() {
   // Sales over time (grouped by day)
   const revenueByDay = useMemo(() => {
     const map = new Map<string, number>()
-    for (const o of orders) {
+    for (const o of filteredOrders) {
       const d = new Date(o.createdAt).toISOString().slice(0, 10) // YYYY-MM-DD
       map.set(d, (map.get(d) || 0) + (Number(o.total) || 0))
     }
     const arr = Array.from(map.entries())
       .map(([date, total]) => ({ date, total }))
-      .sort((a, b) => a.date.localeCompare(b.date))
+      .sort((a, b) => (sortOrder === "asc" ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date)))
     return arr
-  }, [orders])
+  }, [filteredOrders, sortOrder])
 
   // Orders count by day
   const ordersByDay = useMemo(() => {
     const map = new Map<string, number>()
-    for (const o of orders) {
+    for (const o of filteredOrders) {
       const d = new Date(o.createdAt).toISOString().slice(0, 10)
       map.set(d, (map.get(d) || 0) + 1)
     }
     const arr = Array.from(map.entries())
       .map(([date, count]) => ({ date, count }))
-      .sort((a, b) => a.date.localeCompare(b.date))
+      .sort((a, b) => (sortOrder === "asc" ? a.date.localeCompare(b.date) : b.date.localeCompare(a.date)))
     return arr
-  }, [orders])
+  }, [filteredOrders, sortOrder])
 
   // Top items
   const topItems = useMemo(() => {
@@ -85,9 +97,20 @@ export default function SalesView() {
 
   return (
     <div className="p-6 space-y-6">
-      <header className="flex flex-col justify-between items-start bg-primary-foreground rounded-xl p-2 elevation-1 ">
-        <h1 className="text-2xl font-medium text-primary">Dashboard</h1>
-        <p className="text-sm text-muted-foreground">Overview of sales, revenue and expenses</p>
+      <header className="flex flex-col lg:flex-row justify-between items-start bg-primary-foreground rounded-xl p-2 elevation-1 ">
+        <div>
+          <h1 className="text-2xl font-medium text-primary">Dashboard</h1>
+          <p className="text-sm text-muted-foreground">Overview of sales, revenue and expenses</p>
+        </div>
+
+        <div className="mt-3 lg:mt-0 flex flex-col gap-2 lg:flex-row lg:items-center h-13 ">
+          <div className="flex gap-2 items-center ">
+            <label className="text-md text-muted-foreground">From</label>
+            <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="elevation-1 rounded-2xl px-2 py-1 text-sm" />
+            <label className="text-md text-muted-foreground">To</label>
+            <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="elevation-1 rounded-2xl px-2 py-1 text-sm" />
+          </div>
+        </div>
       </header>
 
       {/* KPI cards */}
@@ -120,7 +143,7 @@ export default function SalesView() {
       {/* Charts area */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-primary-foreground rounded-lg p-4 elevation-1">
-          <h3 className="text-lg font-semibold mb-2 text-muted-foreground">Revenue (by day)</h3>
+
           {revenueByDay.length === 0 ? (
             <div className="py-12 text-center text-muted-foreground">No revenue data yet</div>
           ) : (
@@ -129,7 +152,7 @@ export default function SalesView() {
         </div>
 
         <div className="bg-primary-foreground rounded-lg p-4 elevation-1">
-          <h3 className="text-lg font-semibold mb-2 text-muted-foreground">Orders (by day)</h3>
+
           {ordersByDay.length === 0 ? (
             <div className="py-12 text-center text-muted-foreground">No orders yet</div>
           ) : (
@@ -138,7 +161,7 @@ export default function SalesView() {
         </div>
 
         <div className="bg-primary-foreground rounded-lg p-4 elevation-1 lg:col-span-2">
-          <h3 className="text-lg font-semibold mb-2 text-muted-foreground">Top Sold Items</h3>
+ 
           {topItems.length === 0 ? (
             <div className="py-12 text-center text-muted-foreground">No items sold yet</div>
           ) : (
@@ -156,3 +179,7 @@ export default function SalesView() {
     </div>
   )
 }
+
+export const Route = createFileRoute("/sales")({
+  component: SalesView,
+})
