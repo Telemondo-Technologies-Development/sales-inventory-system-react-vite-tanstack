@@ -3,24 +3,24 @@ A modern Sales and Inventory Management Application designed to streamline busin
 This application is built as a fast, offline-capable Progressive Web App (PWA) using modern frontend technologies.
 
 ## Tech Stack
-Vite - React - Tanstack - PWA - Dexie.js(IndexedDB) 
+* Vite
+* React
+* Tanstack
+* PWA
+* Dexie.js(IndexedDB) 
 
 ### UI libraries 
-Tailwind CSS - Shadcn UI - Lucide Icons
+* Tailwind CSS
+* Shadcn UI
+* Lucide Icons
 
 ## Features
-* Inventory Management
-  - Track product quantities, monitor stock levels, and manage item updates to ensure accurate and up-to-date inventory records.
-* Sales Management
-  - Record sales transactions, calculate totals, and maintain a clear history of daily and overall sales performance.
-* Employee Management
-  - Manage employee records, assign roles, and control access levels within the system.
-* Expenses Management
-  - Log and monitor business expenses to help track costs and improve financial decision-making.
-* Restaurant Menu & Order Management
-  - Manage menu items, process customer orders, and handle order workflows efficiently for restaurant operations.
-* Role-Based Login System
-  - Secure authentication system that grants users access based on their assigned roles (e.g., admin, cashier, staff).
+* Track product quantities, monitor stock levels, and manage item updates to ensure accurate and up-to-date inventory records.
+* Record sales transactions, calculate totals, and maintain a clear history of daily and overall sales performance.
+* Manage employee records, assign roles, and control access levels within the system.
+* Log and monitor business expenses to help track costs and improve financial decision-making.
+* Manage menu items, process customer orders, and handle order workflows efficiently for restaurant operations.
+* Secure authentication system that grants users access based on their assigned roles (e.g., admin, cashier, staff).
 
 ## Installation Guide
 
@@ -53,8 +53,6 @@ This will generate optimized static files in the dist directory. You can then de
 * Fast Loading
 
 ## Future Updates
-* Improved Order Logic
-  - Enhanced handling of restaurant orders (e.g., merging, editing, and tracking orders accurately)
-* Expense Naming Convention Bug Fix
-  - Planned solution: intelligent name normalization and quantity merging
+* Enhanced handling of restaurant orders (e.g., merging, editing, and tracking orders accurately)
+* Planned solution: intelligent name normalization and quantity merging
 * Aside Navigation Categorization
